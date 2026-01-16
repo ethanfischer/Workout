@@ -1,5 +1,7 @@
 import SwiftUI
 import SwiftData
+import AudioToolbox
+import ActivityKit
 
 struct ActiveWorkoutView: View {
     let category: WorkoutCategory
@@ -18,6 +20,7 @@ struct ActiveWorkoutView: View {
     @State private var workoutStartTime = Date()
     @State private var showingComplete = false
     @State private var timer: Timer?
+    @State private var liveActivity: Activity<WorkoutActivityAttributes>?
 
     @Query private var workouts: [Workout]
 
@@ -279,10 +282,13 @@ struct ActiveWorkoutView: View {
     private func startRest() {
         isResting = true
         restTimeRemaining = 60
+        startLiveActivity()
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
             if restTimeRemaining > 0 {
                 restTimeRemaining -= 1
+                updateLiveActivity()
             } else {
+                playTimerEndSound()
                 endRest()
             }
         }
@@ -296,6 +302,7 @@ struct ActiveWorkoutView: View {
     private func endRest() {
         timer?.invalidate()
         isResting = false
+        endLiveActivity()
 
         if currentSetIndex + 1 >= totalSets {
             // Move to next exercise
@@ -340,6 +347,60 @@ struct ActiveWorkoutView: View {
         let mins = seconds / 60
         let secs = seconds % 60
         return String(format: "%d:%02d", mins, secs)
+    }
+
+    private func playTimerEndSound() {
+        // Play system sound (tri-tone alert)
+        AudioServicesPlaySystemSound(1007)
+    }
+
+    // MARK: - Live Activity
+
+    private func startLiveActivity() {
+        guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
+
+        let attributes = WorkoutActivityAttributes(workoutCategory: category.rawValue)
+        let state = WorkoutActivityAttributes.ContentState(
+            timeRemaining: restTimeRemaining,
+            currentExercise: currentExercise?.name ?? "",
+            nextExercise: getNextExerciseName(),
+            currentSet: currentSetIndex + 1,
+            totalSets: totalSets
+        )
+
+        do {
+            liveActivity = try Activity.request(
+                attributes: attributes,
+                content: .init(state: state, staleDate: nil)
+            )
+        } catch {
+            print("Error starting Live Activity: \(error)")
+        }
+    }
+
+    private func updateLiveActivity() {
+        guard let activity = liveActivity else { return }
+
+        let state = WorkoutActivityAttributes.ContentState(
+            timeRemaining: restTimeRemaining,
+            currentExercise: currentExercise?.name ?? "",
+            nextExercise: getNextExerciseName(),
+            currentSet: currentSetIndex + 1,
+            totalSets: totalSets
+        )
+
+        Task {
+            await activity.update(using: state)
+        }
+    }
+
+    private func endLiveActivity() {
+        guard let activity = liveActivity else { return }
+
+        Task {
+            await activity.end(dismissalPolicy: .immediate)
+        }
+        liveActivity = nil
     }
 }
 
