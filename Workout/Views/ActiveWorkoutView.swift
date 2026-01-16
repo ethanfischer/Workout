@@ -350,8 +350,15 @@ struct ActiveWorkoutView: View {
     }
 
     private func playTimerEndSound() {
-        // Play system sound (tri-tone alert)
-        AudioServicesPlaySystemSound(1007)
+        // Play triple ding sound
+        let dingSound: SystemSoundID = 1057
+        AudioServicesPlaySystemSound(dingSound)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            AudioServicesPlaySystemSound(dingSound)
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            AudioServicesPlaySystemSound(dingSound)
+        }
     }
 
     // MARK: - Live Activity
