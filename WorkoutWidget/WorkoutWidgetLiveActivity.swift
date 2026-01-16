@@ -1,6 +1,25 @@
+//
+//  WorkoutWidgetLiveActivity.swift
+//  WorkoutWidget
+//
+//  Created by Work on 1/16/26.
+//
+
 import ActivityKit
 import WidgetKit
 import SwiftUI
+
+struct WorkoutActivityAttributes: ActivityAttributes {
+    public struct ContentState: Codable, Hashable {
+        var timeRemaining: Int
+        var currentExercise: String
+        var nextExercise: String?
+        var currentSet: Int
+        var totalSets: Int
+    }
+
+    var workoutCategory: String
+}
 
 struct WorkoutWidgetLiveActivity: Widget {
     var body: some WidgetConfiguration {

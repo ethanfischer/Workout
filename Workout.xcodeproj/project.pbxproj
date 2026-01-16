@@ -6,14 +6,65 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		969CD9F12F1A8E8D00794498 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 969CD9F02F1A8E8D00794498 /* WidgetKit.framework */; };
+		969CD9F32F1A8E8D00794498 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 969CD9F22F1A8E8D00794498 /* SwiftUI.framework */; };
+		969CDA022F1A8E8E00794498 /* WorkoutWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 969CD9EE2F1A8E8D00794498 /* WorkoutWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		969CDA002F1A8E8E00794498 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 967421C42F1A7910008CDB7E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 969CD9ED2F1A8E8D00794498;
+			remoteInfo = WorkoutWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		969CDA072F1A8E8E00794498 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				969CDA022F1A8E8E00794498 /* WorkoutWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		967421CC2F1A7910008CDB7E /* Workout.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Workout.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		969CD9EE2F1A8E8D00794498 /* WorkoutWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = WorkoutWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		969CD9F02F1A8E8D00794498 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		969CD9F22F1A8E8D00794498 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		969CDA032F1A8E8E00794498 /* Exceptions for "WorkoutWidget" folder in "WorkoutWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 969CD9ED2F1A8E8D00794498 /* WorkoutWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		967421CE2F1A7910008CDB7E /* Workout */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Workout;
+			sourceTree = "<group>";
+		};
+		969CD9F42F1A8E8D00794498 /* WorkoutWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				969CDA032F1A8E8E00794498 /* Exceptions for "WorkoutWidget" folder in "WorkoutWidgetExtension" target */,
+			);
+			path = WorkoutWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -26,6 +77,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		969CD9EB2F1A8E8D00794498 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				969CD9F32F1A8E8D00794498 /* SwiftUI.framework in Frameworks */,
+				969CD9F12F1A8E8D00794498 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -33,6 +93,8 @@
 			isa = PBXGroup;
 			children = (
 				967421CE2F1A7910008CDB7E /* Workout */,
+				969CD9F42F1A8E8D00794498 /* WorkoutWidget */,
+				969CD9EF2F1A8E8D00794498 /* Frameworks */,
 				967421CD2F1A7910008CDB7E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,8 +103,18 @@
 			isa = PBXGroup;
 			children = (
 				967421CC2F1A7910008CDB7E /* Workout.app */,
+				969CD9EE2F1A8E8D00794498 /* WorkoutWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		969CD9EF2F1A8E8D00794498 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				969CD9F02F1A8E8D00794498 /* WidgetKit.framework */,
+				969CD9F22F1A8E8D00794498 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -55,10 +127,12 @@
 				967421C82F1A7910008CDB7E /* Sources */,
 				967421C92F1A7910008CDB7E /* Frameworks */,
 				967421CA2F1A7910008CDB7E /* Resources */,
+				969CDA072F1A8E8E00794498 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				969CDA012F1A8E8E00794498 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				967421CE2F1A7910008CDB7E /* Workout */,
@@ -69,6 +143,28 @@
 			productName = Workout;
 			productReference = 967421CC2F1A7910008CDB7E /* Workout.app */;
 			productType = "com.apple.product-type.application";
+		};
+		969CD9ED2F1A8E8D00794498 /* WorkoutWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 969CDA042F1A8E8E00794498 /* Build configuration list for PBXNativeTarget "WorkoutWidgetExtension" */;
+			buildPhases = (
+				969CD9EA2F1A8E8D00794498 /* Sources */,
+				969CD9EB2F1A8E8D00794498 /* Frameworks */,
+				969CD9EC2F1A8E8D00794498 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				969CD9F42F1A8E8D00794498 /* WorkoutWidget */,
+			);
+			name = WorkoutWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = WorkoutWidgetExtension;
+			productReference = 969CD9EE2F1A8E8D00794498 /* WorkoutWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -81,6 +177,9 @@
 				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					967421CB2F1A7910008CDB7E = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					969CD9ED2F1A8E8D00794498 = {
 						CreatedOnToolsVersion = 26.2;
 					};
 				};
@@ -100,12 +199,20 @@
 			projectRoot = "";
 			targets = (
 				967421CB2F1A7910008CDB7E /* Workout */,
+				969CD9ED2F1A8E8D00794498 /* WorkoutWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		967421CA2F1A7910008CDB7E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		969CD9EC2F1A8E8D00794498 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +229,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		969CD9EA2F1A8E8D00794498 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		969CDA012F1A8E8E00794498 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 969CD9ED2F1A8E8D00794498 /* WorkoutWidgetExtension */;
+			targetProxy = 969CDA002F1A8E8E00794498 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		967421D52F1A7912008CDB7E /* Debug */ = {
@@ -310,6 +432,66 @@
 			};
 			name = Release;
 		};
+		969CDA052F1A8E8E00794498 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 32A2T8YCJL;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = WorkoutWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = WorkoutWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tiffintown.Workout.Workout.WorkoutWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		969CDA062F1A8E8E00794498 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 32A2T8YCJL;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = WorkoutWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = WorkoutWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tiffintown.Workout.Workout.WorkoutWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -327,6 +509,15 @@
 			buildConfigurations = (
 				967421D82F1A7912008CDB7E /* Debug */,
 				967421D92F1A7912008CDB7E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		969CDA042F1A8E8E00794498 /* Build configuration list for PBXNativeTarget "WorkoutWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				969CDA052F1A8E8E00794498 /* Debug */,
+				969CDA062F1A8E8E00794498 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
