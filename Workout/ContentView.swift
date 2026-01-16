@@ -1,21 +1,44 @@
-//
-//  ContentView.swift
-//  Workout
-//
-//  Created by Work on 1/16/26.
-//
-
 import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationStack {
+            VStack(spacing: 40) {
+                Spacer()
+
+                VStack(spacing: 8) {
+                    Text("TIFFIN")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                    Text("WORKOUT")
+                        .font(.title)
+                        .fontWeight(.medium)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+
+                NavigationLink(destination: CategorySelectionView()) {
+                    Text("START WORKOUT")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.pink)
+                        .cornerRadius(12)
+                }
+                .padding(.horizontal, 40)
+
+                NavigationLink(destination: HistoryView()) {
+                    Text("History")
+                        .font(.subheadline)
+                        .foregroundColor(.pink)
+                }
+
+                Spacer()
+            }
+            .padding()
         }
-        .padding()
     }
 }
 
