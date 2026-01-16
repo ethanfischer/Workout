@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 import AudioToolbox
 import ActivityKit
+import UserNotifications
 
 struct ActiveWorkoutView: View {
     let category: WorkoutCategory
@@ -9,6 +10,7 @@ struct ActiveWorkoutView: View {
 
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
 
     @State private var currentExerciseIndex = 0
     @State private var currentSetIndex = 0
@@ -21,6 +23,7 @@ struct ActiveWorkoutView: View {
     @State private var showingComplete = false
     @State private var timer: Timer?
     @State private var liveActivity: Activity<WorkoutActivityAttributes>?
+    @State private var restEndTime: Date?
 
     @Query private var workouts: [Workout]
 
@@ -64,7 +67,17 @@ struct ActiveWorkoutView: View {
         }
         .onAppear {
             initializeExercise()
+            requestNotificationPermission()
         }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                checkRestStatus()
+            }
+        }
+    }
+
+    private func requestNotificationPermission() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
     }
 
     private var exerciseView: some View {
@@ -282,11 +295,12 @@ struct ActiveWorkoutView: View {
     private func startRest() {
         isResting = true
         restTimeRemaining = 60
+        restEndTime = Date().addingTimeInterval(60)
         startLiveActivity()
+        scheduleRestNotification()
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
             if restTimeRemaining > 0 {
                 restTimeRemaining -= 1
-                updateLiveActivity()
                 // Countdown beeps for last 3 seconds
                 if restTimeRemaining <= 3 && restTimeRemaining > 0 {
                     playCountdownBeep()
@@ -306,7 +320,9 @@ struct ActiveWorkoutView: View {
     private func endRest() {
         timer?.invalidate()
         isResting = false
+        restEndTime = nil
         endLiveActivity()
+        cancelRestNotification()
 
         if currentSetIndex + 1 >= totalSets {
             // Move to next exercise
@@ -407,6 +423,37 @@ struct ActiveWorkoutView: View {
             await activity.end(dismissalPolicy: .immediate)
         }
         liveActivity = nil
+    }
+
+    // MARK: - Notifications
+
+    private func scheduleRestNotification() {
+        let content = UNMutableNotificationContent()
+        content.title = "Rest Complete"
+        content.body = "Time for your next set!"
+        content.sound = .default
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 60, repeats: false)
+        let request = UNNotificationRequest(identifier: "restTimer", content: content, trigger: trigger)
+
+        UNUserNotificationCenter.current().add(request)
+    }
+
+    private func cancelRestNotification() {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["restTimer"])
+    }
+
+    private func checkRestStatus() {
+        guard isResting, let endTime = restEndTime else { return }
+
+        if Date() >= endTime {
+            // Rest period ended while app was backgrounded
+            playTimerEndSound()
+            endRest()
+        } else {
+            // Update remaining time
+            restTimeRemaining = max(0, Int(endTime.timeIntervalSinceNow))
+        }
     }
 }
 
