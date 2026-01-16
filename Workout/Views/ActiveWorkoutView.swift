@@ -374,16 +374,12 @@ struct ActiveWorkoutView: View {
 
     private func startLiveActivity() {
         let authInfo = ActivityAuthorizationInfo()
-        print("Live Activities enabled: \(authInfo.areActivitiesEnabled)")
-
-        guard authInfo.areActivitiesEnabled else {
-            print("Live Activities not enabled - skipping")
-            return
-        }
+        guard authInfo.areActivitiesEnabled else { return }
 
         let attributes = WorkoutActivityAttributes(workoutCategory: category.rawValue)
+        let endTime = Date().addingTimeInterval(TimeInterval(restTimeRemaining))
         let state = WorkoutActivityAttributes.ContentState(
-            timeRemaining: restTimeRemaining,
+            endTime: endTime,
             currentExercise: currentExercise?.name ?? "",
             nextExercise: getNextExerciseName(),
             currentSet: currentSetIndex + 1,
@@ -395,26 +391,13 @@ struct ActiveWorkoutView: View {
                 attributes: attributes,
                 content: .init(state: state, staleDate: nil)
             )
-            print("Live Activity started successfully: \(liveActivity?.id ?? "nil")")
         } catch {
             print("Error starting Live Activity: \(error)")
         }
     }
 
     private func updateLiveActivity() {
-        guard let activity = liveActivity else { return }
-
-        let state = WorkoutActivityAttributes.ContentState(
-            timeRemaining: restTimeRemaining,
-            currentExercise: currentExercise?.name ?? "",
-            nextExercise: getNextExerciseName(),
-            currentSet: currentSetIndex + 1,
-            totalSets: totalSets
-        )
-
-        Task {
-            await activity.update(using: state)
-        }
+        // No longer needed - the system handles the countdown automatically
     }
 
     private func endLiveActivity() {
