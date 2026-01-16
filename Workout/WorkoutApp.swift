@@ -1,11 +1,5 @@
-//
-//  WorkoutApp.swift
-//  Workout
-//
-//  Created by Work on 1/16/26.
-//
-
 import SwiftUI
+import SwiftData
 
 @main
 struct WorkoutApp: App {
@@ -13,5 +7,6 @@ struct WorkoutApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: [Workout.self, CompletedExercise.self, ExerciseSet.self])
     }
 }
