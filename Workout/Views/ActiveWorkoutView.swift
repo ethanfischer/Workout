@@ -261,14 +261,17 @@ struct ActiveWorkoutView: View {
         completedSets[currentExerciseIndex].append(set)
 
         if currentSetIndex + 1 >= totalSets {
+            // Last set of this exercise
             if currentExerciseIndex + 1 >= selectedExercises.count {
+                // Last exercise - workout complete
                 saveWorkout()
                 showingComplete = true
             } else {
+                // More exercises - rest then move to next exercise
                 startRest()
             }
         } else {
-            currentSetIndex += 1
+            // More sets - rest then move to next set
             startRest()
         }
     }
@@ -295,10 +298,13 @@ struct ActiveWorkoutView: View {
         isResting = false
 
         if currentSetIndex + 1 >= totalSets {
+            // Move to next exercise
             currentExerciseIndex += 1
             currentSetIndex = 0
             initializeExercise()
         } else {
+            // Move to next set
+            currentSetIndex += 1
             if let lastData = getLastSetData() {
                 weight = lastData.weight
                 reps = lastData.reps
