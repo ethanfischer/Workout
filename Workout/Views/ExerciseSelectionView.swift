@@ -16,6 +16,11 @@ struct ExerciseSelectionView: View {
         }
     }
 
+    private var sortedSelectedExercises: [ExerciseDefinition] {
+        let allExercises = ExerciseData.exercises(for: category)
+        return allExercises.filter { selectedExercises.contains($0) }
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: 4) {
@@ -43,7 +48,7 @@ struct ExerciseSelectionView: View {
 
             NavigationLink(destination: ActiveWorkoutView(
                 category: category,
-                selectedExercises: Array(selectedExercises)
+                selectedExercises: sortedSelectedExercises
             )) {
                 Text("START WORKOUT (\(selectedExercises.count))")
                     .font(.headline)
