@@ -287,6 +287,10 @@ struct ActiveWorkoutView: View {
             if restTimeRemaining > 0 {
                 restTimeRemaining -= 1
                 updateLiveActivity()
+                // Countdown beeps for last 3 seconds
+                if restTimeRemaining <= 3 && restTimeRemaining > 0 {
+                    playCountdownBeep()
+                }
             } else {
                 playTimerEndSound()
                 endRest()
@@ -349,14 +353,19 @@ struct ActiveWorkoutView: View {
         return String(format: "%d:%02d", mins, secs)
     }
 
+    private func playCountdownBeep() {
+        // Single beep for countdown
+        AudioServicesPlaySystemSound(1057)
+    }
+
     private func playTimerEndSound() {
         // Play triple ding sound
         let dingSound: SystemSoundID = 1057
         AudioServicesPlaySystemSound(dingSound)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             AudioServicesPlaySystemSound(dingSound)
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             AudioServicesPlaySystemSound(dingSound)
         }
     }
@@ -364,7 +373,13 @@ struct ActiveWorkoutView: View {
     // MARK: - Live Activity
 
     private func startLiveActivity() {
-        guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
+        let authInfo = ActivityAuthorizationInfo()
+        print("Live Activities enabled: \(authInfo.areActivitiesEnabled)")
+
+        guard authInfo.areActivitiesEnabled else {
+            print("Live Activities not enabled - skipping")
+            return
+        }
 
         let attributes = WorkoutActivityAttributes(workoutCategory: category.rawValue)
         let state = WorkoutActivityAttributes.ContentState(
@@ -380,6 +395,7 @@ struct ActiveWorkoutView: View {
                 attributes: attributes,
                 content: .init(state: state, staleDate: nil)
             )
+            print("Live Activity started successfully: \(liveActivity?.id ?? "nil")")
         } catch {
             print("Error starting Live Activity: \(error)")
         }
