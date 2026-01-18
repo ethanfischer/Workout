@@ -24,6 +24,7 @@ struct ActiveWorkoutView: View {
     @State private var timer: Timer?
     @State private var liveActivity: Activity<WorkoutActivityAttributes>?
     @State private var restEndTime: Date?
+    @State private var showingEndConfirmation = false
 
     @Query private var workouts: [Workout]
 
@@ -55,7 +56,7 @@ struct ActiveWorkoutView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button("End") {
-                    dismiss()
+                    showingEndConfirmation = true
                 }
                 .foregroundColor(.red)
             }
@@ -64,6 +65,24 @@ struct ActiveWorkoutView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
+        }
+        .alert("End Workout?", isPresented: $showingEndConfirmation) {
+            Button("Save & Exit", role: nil) {
+                savePartialWorkout()
+                endLiveActivity()
+                cancelRestNotification()
+                timer?.invalidate()
+                dismiss()
+            }
+            Button("Discard", role: .destructive) {
+                endLiveActivity()
+                cancelRestNotification()
+                timer?.invalidate()
+                dismiss()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Would you like to save your progress so far?")
         }
         .onAppear {
             initializeExercise()
@@ -355,6 +374,25 @@ struct ActiveWorkoutView: View {
         workout.durationSeconds = Int(Date().timeIntervalSince(workoutStartTime))
 
         for (index, exercise) in selectedExercises.enumerated() {
+            let completed = CompletedExercise(name: exercise.name, order: index)
+            completed.sets = completedSets[index]
+            workout.exercises.append(completed)
+        }
+
+        modelContext.insert(workout)
+    }
+
+    private func savePartialWorkout() {
+        // Only save if there's at least one completed set
+        let hasCompletedSets = completedSets.contains { !$0.isEmpty }
+        guard hasCompletedSets else { return }
+
+        let workout = Workout(category: category)
+        workout.durationSeconds = Int(Date().timeIntervalSince(workoutStartTime))
+
+        // Only save exercises that have at least one completed set
+        for (index, exercise) in selectedExercises.enumerated() {
+            guard index < completedSets.count && !completedSets[index].isEmpty else { continue }
             let completed = CompletedExercise(name: exercise.name, order: index)
             completed.sets = completedSets[index]
             workout.exercises.append(completed)
