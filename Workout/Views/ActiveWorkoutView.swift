@@ -19,12 +19,15 @@ struct ActiveWorkoutView: View {
     @State private var isResting = false
     @State private var restTimeRemaining = 60
     @State private var completedSets: [[ExerciseSet]] = []
-    @State private var workoutStartTime = Date()
     @State private var showingComplete = false
     @State private var timer: Timer?
     @State private var liveActivity: Activity<WorkoutActivityAttributes>?
     @State private var restEndTime: Date?
     @State private var showingEndConfirmation = false
+    @State private var isPaused = false
+    @State private var elapsedTime: Int = 0
+    @State private var workoutTimer: Timer?
+    @State private var pausedRestTimeRemaining: Int?
 
     @Query private var workouts: [Workout]
 
@@ -44,8 +47,10 @@ struct ActiveWorkoutView: View {
                     category: category,
                     completedSets: completedSets,
                     exercises: selectedExercises,
-                    duration: Int(Date().timeIntervalSince(workoutStartTime))
+                    duration: elapsedTime
                 )
+            } else if isPaused {
+                pausedView
             } else if isResting {
                 restView
             } else {
@@ -55,10 +60,20 @@ struct ActiveWorkoutView: View {
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
-                Button("End") {
-                    showingEndConfirmation = true
+                if !isPaused && !showingComplete {
+                    Button {
+                        togglePause()
+                    } label: {
+                        Image(systemName: "pause.fill")
+                            .foregroundColor(.pink)
+                    }
                 }
-                .foregroundColor(.red)
+            }
+            ToolbarItem(placement: .principal) {
+                Text(formatTime(elapsedTime))
+                    .font(.system(.title2, design: .monospaced))
+                    .fontWeight(.semibold)
+                    .foregroundColor(isPaused ? .secondary : .primary)
             }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Text("\(currentExerciseIndex + 1) of \(selectedExercises.count)")
@@ -72,12 +87,14 @@ struct ActiveWorkoutView: View {
                 endLiveActivity()
                 cancelRestNotification()
                 timer?.invalidate()
+                workoutTimer?.invalidate()
                 dismiss()
             }
             Button("Discard", role: .destructive) {
                 endLiveActivity()
                 cancelRestNotification()
                 timer?.invalidate()
+                workoutTimer?.invalidate()
                 dismiss()
             }
             Button("Cancel", role: .cancel) {}
@@ -87,6 +104,7 @@ struct ActiveWorkoutView: View {
         .onAppear {
             initializeExercise()
             requestNotificationPermission()
+            startWorkoutTimer()
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
@@ -259,6 +277,46 @@ struct ActiveWorkoutView: View {
         }
     }
 
+    private var pausedView: some View {
+        VStack(spacing: 24) {
+            Spacer()
+
+            Text("PAUSED")
+                .font(.title)
+                .fontWeight(.bold)
+
+            Text(formatTime(elapsedTime))
+                .font(.system(size: 72, weight: .bold, design: .monospaced))
+                .foregroundColor(.secondary)
+
+            Spacer()
+
+            VStack(spacing: 16) {
+                Button {
+                    togglePause()
+                } label: {
+                    Text("RESUME")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.pink)
+                        .cornerRadius(12)
+                }
+
+                Button {
+                    showingEndConfirmation = true
+                } label: {
+                    Text("End Workout")
+                        .font(.subheadline)
+                        .foregroundColor(.red)
+                }
+            }
+            .padding(.horizontal, 40)
+            .padding(.bottom, 40)
+        }
+    }
+
     private func initializeExercise() {
         if completedSets.isEmpty {
             completedSets = Array(repeating: [], count: selectedExercises.count)
@@ -358,6 +416,50 @@ struct ActiveWorkoutView: View {
         }
     }
 
+    // MARK: - Workout Timer
+
+    private func startWorkoutTimer() {
+        workoutTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+            if !isPaused {
+                elapsedTime += 1
+            }
+        }
+    }
+
+    private func togglePause() {
+        isPaused.toggle()
+
+        if isPaused {
+            // Pausing - save rest timer state if resting
+            if isResting {
+                pausedRestTimeRemaining = restTimeRemaining
+                timer?.invalidate()
+                endLiveActivity()
+                cancelRestNotification()
+            }
+        } else {
+            // Resuming - restart rest timer if we were resting
+            if isResting, let remaining = pausedRestTimeRemaining {
+                restTimeRemaining = remaining
+                restEndTime = Date().addingTimeInterval(TimeInterval(remaining))
+                startLiveActivity()
+                scheduleRestNotification()
+                timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+                    if restTimeRemaining > 0 {
+                        restTimeRemaining -= 1
+                        if restTimeRemaining <= 3 && restTimeRemaining > 0 {
+                            playCountdownBeep()
+                        }
+                    } else {
+                        playTimerEndSound()
+                        endRest()
+                    }
+                }
+                pausedRestTimeRemaining = nil
+            }
+        }
+    }
+
     private func getNextExerciseName() -> String? {
         if currentSetIndex + 1 >= totalSets {
             if currentExerciseIndex + 1 < selectedExercises.count {
@@ -370,8 +472,9 @@ struct ActiveWorkoutView: View {
     }
 
     private func saveWorkout() {
+        workoutTimer?.invalidate()
         let workout = Workout(category: category)
-        workout.durationSeconds = Int(Date().timeIntervalSince(workoutStartTime))
+        workout.durationSeconds = elapsedTime
 
         for (index, exercise) in selectedExercises.enumerated() {
             let completed = CompletedExercise(name: exercise.name, order: index)
@@ -383,12 +486,13 @@ struct ActiveWorkoutView: View {
     }
 
     private func savePartialWorkout() {
+        workoutTimer?.invalidate()
         // Only save if there's at least one completed set
         let hasCompletedSets = completedSets.contains { !$0.isEmpty }
         guard hasCompletedSets else { return }
 
         let workout = Workout(category: category)
-        workout.durationSeconds = Int(Date().timeIntervalSince(workoutStartTime))
+        workout.durationSeconds = elapsedTime
 
         // Only save exercises that have at least one completed set
         for (index, exercise) in selectedExercises.enumerated() {
