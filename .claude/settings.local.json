@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(superpowers:writing-plans)",
+      "Skill(superpowers:subagent-driven-development)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: add SwiftData models for Workout, Exercise, Set\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(chmod:*)",
+      "Bash(/Users/work/Repos/TiffinWorkout/Workout/build-app.sh)",
+      "Bash(xcodebuild:*)",
+      "Bash(git commit:*)",
+      "Bash(xcrun simctl boot:*)",
+      "Bash(open -a Simulator)",
+      "Bash(xcrun simctl install:*)",
+      "Bash(xcrun simctl launch:*)",
+      "Bash(xcrun simctl terminate:*)",
+      "Bash(plutil:*)",
+      "Bash(gh repo create:*)",
+      "Bash(find:*)"
+    ]
+  }
+}
