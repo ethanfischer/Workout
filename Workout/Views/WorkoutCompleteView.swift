@@ -5,6 +5,7 @@ struct WorkoutCompleteView: View {
     let completedSets: [[ExerciseSet]]
     let exercises: [ExerciseDefinition]
     let duration: Int
+    @Binding var navigationPath: NavigationPath
 
     @Environment(\.dismiss) private var dismiss
 
@@ -53,7 +54,9 @@ struct WorkoutCompleteView: View {
 
             Spacer()
 
-            NavigationLink(destination: ContentView()) {
+            Button {
+                navigateToHistory()
+            } label: {
                 Text("DONE")
                     .font(.headline)
                     .foregroundColor(.white)
@@ -66,6 +69,11 @@ struct WorkoutCompleteView: View {
             .padding(.bottom, 40)
         }
         .navigationBarBackButtonHidden(true)
+    }
+
+    private func navigateToHistory() {
+        navigationPath.removeLast(navigationPath.count)
+        navigationPath.append(AppDestination.history)
     }
 
     private func formatDuration(_ seconds: Int) -> String {
@@ -83,6 +91,7 @@ struct WorkoutCompleteView: View {
         exercises: [
             ExerciseDefinition(name: "Bench Press", type: .compound, category: .push, defaultSets: 3, defaultReps: "10")
         ],
-        duration: 1800
+        duration: 1800,
+        navigationPath: .constant(NavigationPath())
     )
 }

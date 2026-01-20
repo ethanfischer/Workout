@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ExerciseSelectionView: View {
     let category: WorkoutCategory
+    @Binding var navigationPath: NavigationPath
     @State private var selectedExercises: Set<ExerciseDefinition> = []
 
     private var exercisesByType: [(type: ExerciseType, exercises: [ExerciseDefinition])] {
@@ -48,7 +49,8 @@ struct ExerciseSelectionView: View {
 
             NavigationLink(destination: ActiveWorkoutView(
                 category: category,
-                selectedExercises: sortedSelectedExercises
+                selectedExercises: sortedSelectedExercises,
+                navigationPath: $navigationPath
             )) {
                 Text("START WORKOUT (\(selectedExercises.count))")
                     .font(.headline)
@@ -154,6 +156,6 @@ struct ExerciseTypeSection: View {
 
 #Preview {
     NavigationStack {
-        ExerciseSelectionView(category: .push)
+        ExerciseSelectionView(category: .push, navigationPath: .constant(NavigationPath()))
     }
 }

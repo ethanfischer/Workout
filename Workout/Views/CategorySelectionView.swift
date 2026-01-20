@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct CategorySelectionView: View {
+    @Binding var navigationPath: NavigationPath
+
     var body: some View {
         VStack(spacing: 20) {
             Text("SELECT CATEGORY")
@@ -10,7 +12,7 @@ struct CategorySelectionView: View {
             Spacer()
 
             ForEach(WorkoutCategory.allCases, id: \.self) { category in
-                NavigationLink(destination: ExerciseSelectionView(category: category)) {
+                NavigationLink(destination: ExerciseSelectionView(category: category, navigationPath: $navigationPath)) {
                     Text(category.rawValue.uppercased())
                         .font(.title2)
                         .fontWeight(.semibold)
@@ -32,6 +34,6 @@ struct CategorySelectionView: View {
 
 #Preview {
     NavigationStack {
-        CategorySelectionView()
+        CategorySelectionView(navigationPath: .constant(NavigationPath()))
     }
 }

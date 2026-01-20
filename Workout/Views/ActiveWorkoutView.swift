@@ -7,6 +7,7 @@ import UserNotifications
 struct ActiveWorkoutView: View {
     let category: WorkoutCategory
     let selectedExercises: [ExerciseDefinition]
+    @Binding var navigationPath: NavigationPath
 
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
@@ -47,7 +48,8 @@ struct ActiveWorkoutView: View {
                     category: category,
                     completedSets: completedSets,
                     exercises: selectedExercises,
-                    duration: elapsedTime
+                    duration: elapsedTime,
+                    navigationPath: $navigationPath
                 )
             } else if isPaused {
                 pausedView
@@ -88,14 +90,14 @@ struct ActiveWorkoutView: View {
                 cancelRestNotification()
                 timer?.invalidate()
                 workoutTimer?.invalidate()
-                dismiss()
+                navigateToHistory()
             }
             Button("Discard", role: .destructive) {
                 endLiveActivity()
                 cancelRestNotification()
                 timer?.invalidate()
                 workoutTimer?.invalidate()
-                dismiss()
+                navigateToHistory()
             }
             Button("Cancel", role: .cancel) {}
         } message: {
@@ -515,6 +517,12 @@ struct ActiveWorkoutView: View {
         return String(format: "%d:%02d", mins, secs)
     }
 
+    private func navigateToHistory() {
+        // Clear the navigation stack and navigate to history
+        navigationPath.removeLast(navigationPath.count)
+        navigationPath.append(AppDestination.history)
+    }
+
     private func playCountdownBeep() {
         // Single beep for countdown
         AudioServicesPlaySystemSound(1057)
@@ -609,7 +617,8 @@ struct ActiveWorkoutView: View {
             category: .push,
             selectedExercises: [
                 ExerciseDefinition(name: "Bench Press", type: .compound, category: .push, defaultSets: 3, defaultReps: "10")
-            ]
+            ],
+            navigationPath: .constant(NavigationPath())
         )
     }
     .modelContainer(for: [Workout.self, CompletedExercise.self, ExerciseSet.self])

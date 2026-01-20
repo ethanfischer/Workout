@@ -1,8 +1,15 @@
 import SwiftUI
 
+enum AppDestination: Hashable {
+    case categorySelection
+    case history
+}
+
 struct ContentView: View {
+    @State private var navigationPath = NavigationPath()
+
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             VStack(spacing: 40) {
                 Spacer()
 
@@ -18,7 +25,9 @@ struct ContentView: View {
 
                 Spacer()
 
-                NavigationLink(destination: CategorySelectionView()) {
+                Button {
+                    navigationPath.append(AppDestination.categorySelection)
+                } label: {
                     Text("START WORKOUT")
                         .font(.headline)
                         .foregroundColor(.white)
@@ -29,7 +38,9 @@ struct ContentView: View {
                 }
                 .padding(.horizontal, 40)
 
-                NavigationLink(destination: HistoryView()) {
+                Button {
+                    navigationPath.append(AppDestination.history)
+                } label: {
                     Text("History")
                         .font(.subheadline)
                         .foregroundColor(.pink)
@@ -38,6 +49,14 @@ struct ContentView: View {
                 Spacer()
             }
             .padding()
+            .navigationDestination(for: AppDestination.self) { destination in
+                switch destination {
+                case .categorySelection:
+                    CategorySelectionView(navigationPath: $navigationPath)
+                case .history:
+                    HistoryView()
+                }
+            }
         }
     }
 }
