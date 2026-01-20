@@ -34,7 +34,9 @@
       "Bash(done)",
       "Bash(for:*)",
       "Bash(do echo -n '$f: ')",
-      "Bash(sips:*)"
+      "Bash(sips:*)",
+      "Bash(grep:*)",
+      "Bash(tree:*)"
     ]
   }
 }
