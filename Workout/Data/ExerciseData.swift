@@ -6,6 +6,11 @@ enum ExerciseType: String, CaseIterable {
     case accessory = "Accessory/Isolation"
 }
 
+enum MediaType {
+    case gif
+    case none
+}
+
 struct ExerciseDefinition: Identifiable, Hashable {
     let id = UUID()
     let name: String
@@ -13,6 +18,30 @@ struct ExerciseDefinition: Identifiable, Hashable {
     let category: WorkoutCategory
     let defaultSets: Int
     let defaultReps: String
+
+    var mediaFilename: String {
+        name.lowercased().replacingOccurrences(of: " ", with: "_").replacingOccurrences(of: "/", with: "_")
+    }
+
+    var mediaType: MediaType {
+        if Bundle.main.url(forResource: mediaFilename, withExtension: "gif") != nil {
+            return .gif
+        }
+        return .none
+    }
+
+    var mediaURL: URL? {
+        Bundle.main.url(forResource: mediaFilename, withExtension: "gif")
+    }
+
+    // Custom Hashable conformance (exclude computed properties)
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+
+    static func == (lhs: ExerciseDefinition, rhs: ExerciseDefinition) -> Bool {
+        lhs.id == rhs.id
+    }
 }
 
 struct ExerciseData {

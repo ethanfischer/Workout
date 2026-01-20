@@ -121,6 +121,10 @@ struct ActiveWorkoutView: View {
         VStack(spacing: 24) {
             Spacer()
 
+            if let exercise = currentExercise {
+                ExerciseMediaView(exercise: exercise, size: 200)
+            }
+
             VStack(spacing: 8) {
                 Text(currentExercise?.name ?? "")
                     .font(.title)

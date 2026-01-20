@@ -16,7 +16,25 @@
       "Bash(xcrun simctl terminate:*)",
       "Bash(plutil:*)",
       "Bash(gh repo create:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "WebSearch",
+      "WebFetch(domain:www.exercisedb.dev)",
+      "WebFetch(domain:www.ascendapi.com)",
+      "WebFetch(domain:www.exercisedb.io)",
+      "WebFetch(domain:rapidapi.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:wger.de)",
+      "WebFetch(domain:gymvisual.com)",
+      "WebFetch(domain:workoutapi.vercel.app)",
+      "Bash(python3:*)",
+      "WebFetch(domain:musclewiki.com)",
+      "Bash(curl:*)",
+      "WebFetch(domain:edb-docs.up.railway.app)",
+      "Bash(ls:*)",
+      "Bash(done)",
+      "Bash(for:*)",
+      "Bash(do echo -n '$f: ')",
+      "Bash(sips:*)"
     ]
   }
 }

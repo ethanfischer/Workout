@@ -120,6 +120,7 @@ struct ExerciseTypeSection: View {
                             HStack(spacing: 8) {
                                 Image(systemName: selectedExercises.contains(exercise) ? "checkmark.square.fill" : "square")
                                     .foregroundColor(selectedExercises.contains(exercise) ? .pink : .gray)
+                                ExerciseMediaView(exercise: exercise, size: 36)
                                 Text(exercise.name)
                                     .font(.caption)
                                     .foregroundColor(.primary)
