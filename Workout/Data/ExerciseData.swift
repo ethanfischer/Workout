@@ -23,6 +23,15 @@ struct ExerciseDefinition: Identifiable, Hashable {
         name.lowercased().replacingOccurrences(of: " ", with: "_").replacingOccurrences(of: "/", with: "_")
     }
 
+    /// Parses defaultReps string (e.g. "10" or "10-12") and returns the first number
+    var defaultRepsInt: Int {
+        let numbers = defaultReps.components(separatedBy: CharacterSet.decimalDigits.inverted)
+        if let first = numbers.first(where: { !$0.isEmpty }), let value = Int(first) {
+            return value
+        }
+        return 10
+    }
+
     var mediaType: MediaType {
         if Bundle.main.url(forResource: mediaFilename, withExtension: "gif") != nil {
             return .gif

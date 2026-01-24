@@ -333,7 +333,7 @@ struct ActiveWorkoutView: View {
             reps = lastData.reps
         } else {
             weight = 0
-            reps = 0
+            reps = currentExercise?.defaultRepsInt ?? 10
         }
     }
 
