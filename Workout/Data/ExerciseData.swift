@@ -46,44 +46,50 @@ struct ExerciseDefinition: Identifiable, Hashable {
 
 struct ExerciseData {
     static let push: [ExerciseDefinition] = [
+        // Compound
         ExerciseDefinition(name: "Push Ups", type: .compound, category: .push, defaultSets: 4, defaultReps: "10"),
-        ExerciseDefinition(name: "Overhead Press", type: .compound, category: .push, defaultSets: 4, defaultReps: "10"),
-        ExerciseDefinition(name: "Bench Press", type: .compound, category: .push, defaultSets: 4, defaultReps: "10"),
-        ExerciseDefinition(name: "Lateral Raises", type: .accessory, category: .push, defaultSets: 3, defaultReps: "10-12"),
-        ExerciseDefinition(name: "Front Raises", type: .accessory, category: .push, defaultSets: 3, defaultReps: "10-12"),
-        ExerciseDefinition(name: "Tricep Extension", type: .accessory, category: .push, defaultSets: 3, defaultReps: "10-12"),
-        ExerciseDefinition(name: "DB Chest Flys", type: .accessory, category: .push, defaultSets: 3, defaultReps: "10-12"),
+        ExerciseDefinition(name: "DB Overhead Press", type: .compound, category: .push, defaultSets: 4, defaultReps: "10"),
+        ExerciseDefinition(name: "DB Bench Press", type: .compound, category: .push, defaultSets: 4, defaultReps: "10"),
+        // Accessory/Isolation
+        ExerciseDefinition(name: "DB Lateral Raises", type: .accessory, category: .push, defaultSets: 3, defaultReps: "10-12"),
+        ExerciseDefinition(name: "DB Front Raises", type: .accessory, category: .push, defaultSets: 3, defaultReps: "10-12"),
         ExerciseDefinition(name: "Tricep Rope Pushdown", type: .accessory, category: .push, defaultSets: 3, defaultReps: "10-12"),
-        ExerciseDefinition(name: "Rear Delt Fly", type: .accessory, category: .push, defaultSets: 3, defaultReps: "10-12"),
+        ExerciseDefinition(name: "DB Skullcrushers", type: .accessory, category: .push, defaultSets: 3, defaultReps: "10-12"),
+        ExerciseDefinition(name: "DB Chest Flys", type: .accessory, category: .push, defaultSets: 3, defaultReps: "10-12"),
     ]
 
     static let pull: [ExerciseDefinition] = [
-        ExerciseDefinition(name: "Lat Pulldown", type: .compound, category: .pull, defaultSets: 4, defaultReps: "10"),
-        ExerciseDefinition(name: "Seated Row", type: .compound, category: .pull, defaultSets: 4, defaultReps: "10"),
-        ExerciseDefinition(name: "Pull Ups", type: .compound, category: .pull, defaultSets: 4, defaultReps: "10"),
+        // Compound
+        ExerciseDefinition(name: "Banded Lat Pulldown", type: .compound, category: .pull, defaultSets: 4, defaultReps: "10"),
+        ExerciseDefinition(name: "Chest Supported DB Row", type: .compound, category: .pull, defaultSets: 4, defaultReps: "10"),
         ExerciseDefinition(name: "Bent Over Row", type: .compound, category: .pull, defaultSets: 4, defaultReps: "10"),
-        ExerciseDefinition(name: "Deadlift", type: .compound, category: .pull, defaultSets: 4, defaultReps: "10"),
+        ExerciseDefinition(name: "DB Upright Row", type: .compound, category: .pull, defaultSets: 4, defaultReps: "10"),
+        // Isolation
         ExerciseDefinition(name: "DB Pullovers", type: .accessory, category: .pull, defaultSets: 3, defaultReps: "10-12"),
         ExerciseDefinition(name: "Renegade Rows", type: .accessory, category: .pull, defaultSets: 3, defaultReps: "10-12"),
-        ExerciseDefinition(name: "Stiff Arm Pulldown", type: .accessory, category: .pull, defaultSets: 3, defaultReps: "10-12"),
-        ExerciseDefinition(name: "Rope Face Pull", type: .accessory, category: .pull, defaultSets: 3, defaultReps: "10-12"),
+        ExerciseDefinition(name: "Banded Face Pull", type: .accessory, category: .pull, defaultSets: 3, defaultReps: "10-12"),
         ExerciseDefinition(name: "DB Curls", type: .accessory, category: .pull, defaultSets: 3, defaultReps: "10-12"),
     ]
 
     static let legs: [ExerciseDefinition] = [
-        ExerciseDefinition(name: "Squat Variation", type: .compound, category: .legs, defaultSets: 4, defaultReps: "10"),
-        ExerciseDefinition(name: "Deadlift", type: .compound, category: .legs, defaultSets: 4, defaultReps: "10"),
-        ExerciseDefinition(name: "Hip Thrust", type: .compound, category: .legs, defaultSets: 4, defaultReps: "10"),
-        ExerciseDefinition(name: "Lunges", type: .unilateral, category: .legs, defaultSets: 3, defaultReps: "10-12"),
-        ExerciseDefinition(name: "Split Squats", type: .unilateral, category: .legs, defaultSets: 3, defaultReps: "10-12"),
-        ExerciseDefinition(name: "Split Stance RDL", type: .unilateral, category: .legs, defaultSets: 3, defaultReps: "10-12"),
-        ExerciseDefinition(name: "Step Ups", type: .unilateral, category: .legs, defaultSets: 3, defaultReps: "10-12"),
-        ExerciseDefinition(name: "Split Stance Hip Thrust", type: .unilateral, category: .legs, defaultSets: 3, defaultReps: "10-12"),
-        ExerciseDefinition(name: "Leg Extension", type: .accessory, category: .legs, defaultSets: 3, defaultReps: "12-15"),
-        ExerciseDefinition(name: "Leg Curl", type: .accessory, category: .legs, defaultSets: 3, defaultReps: "12-15"),
-        ExerciseDefinition(name: "Cable Kickbacks", type: .accessory, category: .legs, defaultSets: 3, defaultReps: "12-15"),
-        ExerciseDefinition(name: "Abductions", type: .accessory, category: .legs, defaultSets: 3, defaultReps: "12-15"),
-        ExerciseDefinition(name: "Calf Raises", type: .accessory, category: .legs, defaultSets: 3, defaultReps: "12-15"),
+        // Compound
+        ExerciseDefinition(name: "Goblet Squat", type: .compound, category: .legs, defaultSets: 4, defaultReps: "10"),
+        ExerciseDefinition(name: "Sumo Squat", type: .compound, category: .legs, defaultSets: 4, defaultReps: "10"),
+        ExerciseDefinition(name: "DB Front Squat", type: .compound, category: .legs, defaultSets: 4, defaultReps: "10"),
+        ExerciseDefinition(name: "DB Deadlift", type: .compound, category: .legs, defaultSets: 4, defaultReps: "10"),
+        ExerciseDefinition(name: "Banded Hip Thrust", type: .compound, category: .legs, defaultSets: 4, defaultReps: "10"),
+        // Unilateral
+        ExerciseDefinition(name: "DB Lunges", type: .unilateral, category: .legs, defaultSets: 3, defaultReps: "10-12"),
+        ExerciseDefinition(name: "DB Split Squats", type: .unilateral, category: .legs, defaultSets: 3, defaultReps: "10-12"),
+        ExerciseDefinition(name: "DB Split Stance RDL", type: .unilateral, category: .legs, defaultSets: 3, defaultReps: "10-12"),
+        ExerciseDefinition(name: "DB Step Ups", type: .unilateral, category: .legs, defaultSets: 3, defaultReps: "10-12"),
+        ExerciseDefinition(name: "DB Split Stance Hip Thrust", type: .unilateral, category: .legs, defaultSets: 3, defaultReps: "10-12"),
+        // Isolation
+        ExerciseDefinition(name: "Resistance Band Hamstring Curl", type: .accessory, category: .legs, defaultSets: 3, defaultReps: "12-15"),
+        ExerciseDefinition(name: "Banded Kickbacks", type: .accessory, category: .legs, defaultSets: 3, defaultReps: "12-15"),
+        ExerciseDefinition(name: "Banded Lateral Walks", type: .accessory, category: .legs, defaultSets: 3, defaultReps: "12-15"),
+        ExerciseDefinition(name: "Side Lying Banded Leg Raise", type: .accessory, category: .legs, defaultSets: 3, defaultReps: "12-15"),
+        ExerciseDefinition(name: "DB Calf Raises", type: .accessory, category: .legs, defaultSets: 3, defaultReps: "12-15"),
     ]
 
     static func exercises(for category: WorkoutCategory) -> [ExerciseDefinition] {

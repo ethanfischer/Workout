@@ -36,7 +36,14 @@
       "Bash(do echo -n '$f: ')",
       "Bash(sips:*)",
       "Bash(grep:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(convert:*)",
+      "Bash(xargs:*)",
+      "Bash(# Check what''s currently in the resources folder ls Workout/Resources/ExerciseMedia/*.gif)",
+      "Bash(echo \"=== Workout/Resources/ExerciseMedia \\(active\\) ===\" ls Workout/Resources/ExerciseMedia/*.gif)",
+      "Bash(wc -l echo \"\" echo \"=== ExerciseMedia_backup ===\" ls ExerciseMedia_backup/*.gif)",
+      "Bash(wc -l echo \"\" echo \"=== new_exercise_gifs ===\" ls new_exercise_gifs/*.gif)",
+      "Bash(wc -l echo \"\" echo \"=== new_exercise_gifs/replacements ===\" ls new_exercise_gifs/replacements/*.gif)"
     ]
   }
 }
