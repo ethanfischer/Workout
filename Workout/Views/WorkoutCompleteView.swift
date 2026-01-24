@@ -37,7 +37,7 @@ struct WorkoutCompleteView: View {
 
                             if index < completedSets.count {
                                 ForEach(completedSets[index].sorted { $0.setNumber < $1.setNumber }) { set in
-                                    Text("Set \(set.setNumber): \(Int(set.weight)) lbs x \(set.reps)")
+                                    Text("Set \(set.setNumber): \(formatWeight(set.weight, isBanded: exercise.isBanded)) x \(set.reps)")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                 }
@@ -79,6 +79,14 @@ struct WorkoutCompleteView: View {
     private func formatDuration(_ seconds: Int) -> String {
         let mins = seconds / 60
         return "\(mins) min"
+    }
+
+    private func formatWeight(_ weight: Double, isBanded: Bool) -> String {
+        if isBanded {
+            return ResistanceLevel.from(rawValue: weight).displayName
+        } else {
+            return "\(Int(weight)) lbs"
+        }
     }
 }
 

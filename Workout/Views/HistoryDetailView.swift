@@ -29,7 +29,7 @@ struct HistoryDetailView: View {
                             HStack {
                                 Text("Set \(set.setNumber):")
                                     .foregroundColor(.secondary)
-                                Text("\(Int(set.weight)) lbs x \(set.reps)")
+                                Text("\(formatWeight(set.weight, exerciseName: exercise.name)) x \(set.reps)")
                             }
                             .font(.subheadline)
                         }
@@ -41,6 +41,18 @@ struct HistoryDetailView: View {
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func isBandedExercise(_ name: String) -> Bool {
+        name.lowercased().contains("banded") || name.lowercased().contains("resistance band")
+    }
+
+    private func formatWeight(_ weight: Double, exerciseName: String) -> String {
+        if isBandedExercise(exerciseName) {
+            return ResistanceLevel.from(rawValue: weight).displayName
+        } else {
+            return "\(Int(weight)) lbs"
+        }
     }
 }
 

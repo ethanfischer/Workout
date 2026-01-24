@@ -1,5 +1,27 @@
 import Foundation
 
+enum ResistanceLevel: Double, CaseIterable {
+    case extraLight = 1.0
+    case light = 2.0
+    case medium = 3.0
+    case hard = 4.0
+    case extraHard = 5.0
+
+    var displayName: String {
+        switch self {
+        case .extraLight: return "Extra Light"
+        case .light: return "Light"
+        case .medium: return "Medium"
+        case .hard: return "Hard"
+        case .extraHard: return "Extra Hard"
+        }
+    }
+
+    static func from(rawValue: Double) -> ResistanceLevel {
+        ResistanceLevel(rawValue: rawValue) ?? .medium
+    }
+}
+
 enum ExerciseType: String, CaseIterable {
     case compound = "Compound"
     case unilateral = "Unilateral"
@@ -43,6 +65,10 @@ struct ExerciseDefinition: Identifiable, Hashable {
         Bundle.main.url(forResource: mediaFilename, withExtension: "gif")
     }
 
+    var isBanded: Bool {
+        name.lowercased().contains("banded") || name.lowercased().contains("resistance band")
+    }
+
     // Custom Hashable conformance (exclude computed properties)
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
@@ -62,7 +88,7 @@ struct ExerciseData {
         // Accessory/Isolation
         ExerciseDefinition(name: "DB Lateral Raises", type: .accessory, category: .push, defaultSets: 3, defaultReps: "10-12"),
         ExerciseDefinition(name: "DB Front Raises", type: .accessory, category: .push, defaultSets: 3, defaultReps: "10-12"),
-        ExerciseDefinition(name: "Tricep Rope Pushdown", type: .accessory, category: .push, defaultSets: 3, defaultReps: "10-12"),
+        ExerciseDefinition(name: "Tricep Band Pushdown", type: .accessory, category: .push, defaultSets: 3, defaultReps: "10-12"),
         ExerciseDefinition(name: "DB Skullcrushers", type: .accessory, category: .push, defaultSets: 3, defaultReps: "10-12"),
         ExerciseDefinition(name: "DB Chest Flys", type: .accessory, category: .push, defaultSets: 3, defaultReps: "10-12"),
         ExerciseDefinition(name: "Dumbbell Tricep Extension", type: .accessory, category: .push, defaultSets: 3, defaultReps: "10-12"),

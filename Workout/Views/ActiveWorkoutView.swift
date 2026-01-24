@@ -141,7 +141,7 @@ struct ActiveWorkoutView: View {
                     Text("LAST TIME")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    Text("\(Int(lastData.weight)) lbs x \(lastData.reps)")
+                    Text("\(formatWeight(lastData.weight)) x \(lastData.reps)")
                         .font(.headline)
                 }
                 .padding()
@@ -157,7 +157,7 @@ struct ActiveWorkoutView: View {
                         if i < completedSets[currentExerciseIndex].count {
                             let set = completedSets[currentExerciseIndex][i]
                             HStack {
-                                Text("Set \(i + 1): \(Int(set.weight)) lbs x \(set.reps)")
+                                Text("Set \(i + 1): \(formatWeight(set.weight)) x \(set.reps)")
                                     .font(.caption)
                                 Image(systemName: "checkmark")
                                     .foregroundColor(.green)
@@ -175,25 +175,46 @@ struct ActiveWorkoutView: View {
             Spacer()
 
             VStack(spacing: 8) {
-                Text("WEIGHT")
+                Text(currentExercise?.isBanded == true ? "RESISTANCE" : "WEIGHT")
                     .font(.caption)
                     .foregroundColor(.secondary)
                 HStack(spacing: 20) {
                     Button {
-                        if weight >= 5 { weight -= 5 }
+                        if currentExercise?.isBanded == true {
+                            let currentLevel = ResistanceLevel.from(rawValue: weight)
+                            if let currentIndex = ResistanceLevel.allCases.firstIndex(of: currentLevel), currentIndex > 0 {
+                                weight = ResistanceLevel.allCases[currentIndex - 1].rawValue
+                            }
+                        } else {
+                            if weight >= 5 { weight -= 5 }
+                        }
                     } label: {
                         Image(systemName: "minus.circle.fill")
                             .font(.title)
                             .foregroundColor(.pink)
                     }
 
-                    Text("\(Int(weight)) lbs")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .frame(width: 100)
+                    if currentExercise?.isBanded == true {
+                        Text(ResistanceLevel.from(rawValue: weight).displayName)
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                            .frame(width: 120)
+                    } else {
+                        Text("\(Int(weight)) lbs")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                            .frame(width: 100)
+                    }
 
                     Button {
-                        weight += 5
+                        if currentExercise?.isBanded == true {
+                            let currentLevel = ResistanceLevel.from(rawValue: weight)
+                            if let currentIndex = ResistanceLevel.allCases.firstIndex(of: currentLevel), currentIndex < ResistanceLevel.allCases.count - 1 {
+                                weight = ResistanceLevel.allCases[currentIndex + 1].rawValue
+                            }
+                        } else {
+                            weight += 5
+                        }
                     } label: {
                         Image(systemName: "plus.circle.fill")
                             .font(.title)
@@ -332,7 +353,7 @@ struct ActiveWorkoutView: View {
             weight = lastData.weight
             reps = lastData.reps
         } else {
-            weight = 0
+            weight = currentExercise?.isBanded == true ? ResistanceLevel.medium.rawValue : 0
             reps = currentExercise?.defaultRepsInt ?? 10
         }
     }
@@ -515,6 +536,14 @@ struct ActiveWorkoutView: View {
         let mins = seconds / 60
         let secs = seconds % 60
         return String(format: "%d:%02d", mins, secs)
+    }
+
+    private func formatWeight(_ weight: Double) -> String {
+        if currentExercise?.isBanded == true {
+            return ResistanceLevel.from(rawValue: weight).displayName
+        } else {
+            return "\(Int(weight)) lbs"
+        }
     }
 
     private func navigateToHistory() {
