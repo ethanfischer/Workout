@@ -56,6 +56,7 @@ struct ExerciseData {
         ExerciseDefinition(name: "Tricep Rope Pushdown", type: .accessory, category: .push, defaultSets: 3, defaultReps: "10-12"),
         ExerciseDefinition(name: "DB Skullcrushers", type: .accessory, category: .push, defaultSets: 3, defaultReps: "10-12"),
         ExerciseDefinition(name: "DB Chest Flys", type: .accessory, category: .push, defaultSets: 3, defaultReps: "10-12"),
+        ExerciseDefinition(name: "Dumbbell Tricep Extension", type: .accessory, category: .push, defaultSets: 3, defaultReps: "10-12"),
     ]
 
     static let pull: [ExerciseDefinition] = [
