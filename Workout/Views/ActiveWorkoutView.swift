@@ -139,6 +139,7 @@ struct ActiveWorkoutView: View {
 
             if let exercise = currentExercise {
                 ExerciseMediaView(exercise: exercise, size: 200)
+                    .padding(.top, 8)
             }
 
             VStack(spacing: 8) {
@@ -150,38 +151,38 @@ struct ActiveWorkoutView: View {
                     .foregroundColor(.secondary)
             }
 
-            if let lastData = getLastSetData() {
-                VStack(spacing: 4) {
+            if let lastSets = getLastWorkoutSets(), !lastSets.isEmpty, currentExerciseIndex < completedSets.count {
+                VStack(alignment: .leading, spacing: 6) {
                     Text("LAST TIME")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    Text("\(formatWeight(lastData.weight)) x \(lastData.reps)")
-                        .font(.headline)
-                }
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(Color(.systemGray6))
-                .cornerRadius(8)
-                .padding(.horizontal, 40)
-            }
+                    ForEach(lastSets) { set in
+                        let setIndex = set.setNumber - 1
+                        let isCurrentSet = currentSetIndex == setIndex
+                        let isCompleted = setIndex < completedSets[currentExerciseIndex].count
 
-            if currentSetIndex > 0 {
-                VStack(alignment: .leading, spacing: 4) {
-                    ForEach(0..<currentSetIndex, id: \.self) { i in
-                        if i < completedSets[currentExerciseIndex].count {
-                            let set = completedSets[currentExerciseIndex][i]
-                            HStack {
-                                Text("Set \(i + 1): \(formatWeight(set.weight)) x \(set.reps)")
-                                    .font(.caption)
+                        HStack {
+                            Text("Set \(set.setNumber):")
+                                .foregroundColor(isCurrentSet ? .primary : .secondary)
+                            Text("\(formatWeight(set.weight)) x \(set.reps)")
+                                .fontWeight(isCurrentSet ? .bold : .regular)
+
+                            if isCompleted {
+                                let completedSet = completedSets[currentExerciseIndex][setIndex]
+                                Text("→")
+                                    .foregroundColor(.secondary)
+                                Text("\(formatWeight(completedSet.weight)) x \(completedSet.reps)")
+                                    .foregroundColor(.green)
                                 Image(systemName: "checkmark")
                                     .foregroundColor(.green)
                             }
                         }
+                        .font(.subheadline)
                     }
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color(.systemGray6).opacity(0.5))
+                .background(Color(.systemGray6))
                 .cornerRadius(8)
                 .padding(.horizontal, 40)
             }
@@ -385,6 +386,18 @@ struct ActiveWorkoutView: View {
                 } else if let lastSet = sortedSets.last {
                     return (lastSet.weight, lastSet.reps)
                 }
+            }
+        }
+        return nil
+    }
+
+    private func getLastWorkoutSets() -> [ExerciseSet]? {
+        guard let exerciseName = currentExercise?.name else { return nil }
+
+        let sorted = workouts.sorted { $0.date > $1.date }
+        for workout in sorted {
+            if let exercise = workout.exercises.first(where: { $0.name == exerciseName }) {
+                return exercise.sets.sorted { $0.setNumber < $1.setNumber }
             }
         }
         return nil
