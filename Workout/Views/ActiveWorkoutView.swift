@@ -31,6 +31,10 @@ struct ActiveWorkoutView: View {
     @State private var workoutTimer: Timer?
     @State private var pausedRestTimeRemaining: Int?
     @State private var hasRestoredState = false
+    @State private var showingEditWorkout = false
+    @State private var editingSet: (exerciseIndex: Int, setIndex: Int)? = nil
+    @State private var editWeight: Double = 0
+    @State private var editReps: Int = 0
 
     @Query private var workouts: [Workout]
 
@@ -126,6 +130,9 @@ struct ActiveWorkoutView: View {
             @unknown default:
                 break
             }
+        }
+        .sheet(isPresented: $showingEditWorkout) {
+            editWorkoutSheet
         }
     }
 
@@ -335,6 +342,19 @@ struct ActiveWorkoutView: View {
 
             VStack(spacing: 16) {
                 Button {
+                    showingEditWorkout = true
+                } label: {
+                    Text("EDIT WORKOUT")
+                        .font(.headline)
+                        .foregroundColor(.pink)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .cornerRadius(12)
+                }
+                .disabled(!completedSets.contains { !$0.isEmpty })
+
+                Button {
                     togglePause()
                 } label: {
                     Text("RESUME")
@@ -356,6 +376,178 @@ struct ActiveWorkoutView: View {
             }
             .padding(.horizontal, 40)
             .padding(.bottom, 40)
+        }
+    }
+
+    private var editWorkoutSheet: some View {
+        NavigationStack {
+            List {
+                ForEach(Array(selectedExercises.enumerated()), id: \.offset) { exerciseIndex, exercise in
+                    let sets = exerciseIndex < completedSets.count ? completedSets[exerciseIndex] : []
+                    if !sets.isEmpty {
+                        Section(exercise.name) {
+                            ForEach(Array(sets.enumerated()), id: \.offset) { setIndex, set in
+                                Button {
+                                    editWeight = set.weight
+                                    editReps = set.reps
+                                    editingSet = (exerciseIndex, setIndex)
+                                } label: {
+                                    HStack {
+                                        Text("Set \(set.setNumber)")
+                                            .foregroundColor(.primary)
+                                        Spacer()
+                                        Text(formatWeightForExercise(set.weight, exercise: exercise))
+                                            .foregroundColor(.secondary)
+                                        Text("x")
+                                            .foregroundColor(.secondary)
+                                        Text("\(set.reps)")
+                                            .foregroundColor(.secondary)
+                                        Image(systemName: "chevron.right")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Edit Workout")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        showingEditWorkout = false
+                    }
+                }
+            }
+            .sheet(item: Binding(
+                get: { editingSet.map { EditingSetIdentifier(exerciseIndex: $0.exerciseIndex, setIndex: $0.setIndex) } },
+                set: { editingSet = $0.map { ($0.exerciseIndex, $0.setIndex) } }
+            )) { identifier in
+                editSetSheet(exerciseIndex: identifier.exerciseIndex, setIndex: identifier.setIndex)
+            }
+        }
+    }
+
+    private func editSetSheet(exerciseIndex: Int, setIndex: Int) -> some View {
+        let exercise = selectedExercises[exerciseIndex]
+        return NavigationStack {
+            VStack(spacing: 32) {
+                Spacer()
+
+                VStack(spacing: 8) {
+                    Text(exercise.isBanded ? "RESISTANCE" : "WEIGHT")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    HStack(spacing: 20) {
+                        Button {
+                            if exercise.isBanded {
+                                let currentLevel = ResistanceLevel.from(rawValue: editWeight)
+                                if let currentIndex = ResistanceLevel.allCases.firstIndex(of: currentLevel), currentIndex > 0 {
+                                    editWeight = ResistanceLevel.allCases[currentIndex - 1].rawValue
+                                }
+                            } else {
+                                if editWeight >= 5 { editWeight -= 5 }
+                            }
+                        } label: {
+                            Image(systemName: "minus.circle.fill")
+                                .font(.title)
+                                .foregroundColor(.pink)
+                        }
+
+                        if exercise.isBanded {
+                            Text(ResistanceLevel.from(rawValue: editWeight).displayName)
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                                .frame(width: 120)
+                        } else {
+                            Text("\(Int(editWeight)) lbs")
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                                .frame(width: 100)
+                        }
+
+                        Button {
+                            if exercise.isBanded {
+                                let currentLevel = ResistanceLevel.from(rawValue: editWeight)
+                                if let currentIndex = ResistanceLevel.allCases.firstIndex(of: currentLevel), currentIndex < ResistanceLevel.allCases.count - 1 {
+                                    editWeight = ResistanceLevel.allCases[currentIndex + 1].rawValue
+                                }
+                            } else {
+                                editWeight += 5
+                            }
+                        } label: {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.title)
+                                .foregroundColor(.pink)
+                        }
+                    }
+                }
+
+                VStack(spacing: 8) {
+                    Text("REPS")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    HStack(spacing: 20) {
+                        Button {
+                            if editReps > 0 { editReps -= 1 }
+                        } label: {
+                            Image(systemName: "minus.circle.fill")
+                                .font(.title)
+                                .foregroundColor(.pink)
+                        }
+
+                        Text("\(editReps)")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                            .frame(width: 100)
+
+                        Button {
+                            editReps += 1
+                        } label: {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.title)
+                                .foregroundColor(.pink)
+                        }
+                    }
+                }
+
+                Spacer()
+
+                Button {
+                    completedSets[exerciseIndex][setIndex].weight = editWeight
+                    completedSets[exerciseIndex][setIndex].reps = editReps
+                    editingSet = nil
+                } label: {
+                    Text("SAVE")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.pink)
+                        .cornerRadius(12)
+                }
+                .padding(.horizontal, 40)
+                .padding(.bottom, 40)
+            }
+            .navigationTitle("Edit Set \(setIndex + 1)")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        editingSet = nil
+                    }
+                }
+            }
+        }
+    }
+
+    private func formatWeightForExercise(_ weight: Double, exercise: ExerciseDefinition) -> String {
+        if exercise.isBanded {
+            return ResistanceLevel.from(rawValue: weight).displayName
+        } else {
+            return "\(Int(weight)) lbs"
         }
     }
 
@@ -759,6 +951,12 @@ struct ActiveWorkoutView: View {
             }
         }
     }
+}
+
+private struct EditingSetIdentifier: Identifiable {
+    let exerciseIndex: Int
+    let setIndex: Int
+    var id: String { "\(exerciseIndex)-\(setIndex)" }
 }
 
 #Preview {
