@@ -50,7 +50,8 @@ struct ExerciseSelectionView: View {
             NavigationLink(destination: ActiveWorkoutView(
                 category: category,
                 selectedExercises: sortedSelectedExercises,
-                navigationPath: $navigationPath
+                navigationPath: $navigationPath,
+                restoredState: nil
             )) {
                 Text("START WORKOUT (\(selectedExercises.count))")
                     .font(.headline)

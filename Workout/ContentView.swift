@@ -3,10 +3,12 @@ import SwiftUI
 enum AppDestination: Hashable {
     case categorySelection
     case history
+    case resumeWorkout(InProgressWorkoutState)
 }
 
 struct ContentView: View {
     @State private var navigationPath = NavigationPath()
+    @State private var hasCheckedForSavedWorkout = false
 
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -55,8 +57,37 @@ struct ContentView: View {
                     CategorySelectionView(navigationPath: $navigationPath)
                 case .history:
                     HistoryView()
+                case .resumeWorkout(let state):
+                    if let category = WorkoutCategory(rawValue: state.category) {
+                        let exercises = reconstructExercises(from: state.exerciseNames, category: category)
+                        ActiveWorkoutView(
+                            category: category,
+                            selectedExercises: exercises,
+                            navigationPath: $navigationPath,
+                            restoredState: state
+                        )
+                    }
                 }
             }
+            .onAppear {
+                checkForSavedWorkout()
+            }
+        }
+    }
+
+    private func checkForSavedWorkout() {
+        guard !hasCheckedForSavedWorkout else { return }
+        hasCheckedForSavedWorkout = true
+
+        if let savedState = WorkoutStateManager.shared.load() {
+            navigationPath.append(AppDestination.resumeWorkout(savedState))
+        }
+    }
+
+    private func reconstructExercises(from names: [String], category: WorkoutCategory) -> [ExerciseDefinition] {
+        let allExercises = ExerciseData.exercises(for: category)
+        return names.compactMap { name in
+            allExercises.first { $0.name == name }
         }
     }
 }

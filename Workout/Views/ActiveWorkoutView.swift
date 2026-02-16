@@ -8,6 +8,7 @@ struct ActiveWorkoutView: View {
     let category: WorkoutCategory
     let selectedExercises: [ExerciseDefinition]
     @Binding var navigationPath: NavigationPath
+    let restoredState: InProgressWorkoutState?
 
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
@@ -29,6 +30,7 @@ struct ActiveWorkoutView: View {
     @State private var elapsedTime: Int = 0
     @State private var workoutTimer: Timer?
     @State private var pausedRestTimeRemaining: Int?
+    @State private var hasRestoredState = false
 
     @Query private var workouts: [Workout]
 
@@ -86,6 +88,7 @@ struct ActiveWorkoutView: View {
         .alert("End Workout?", isPresented: $showingEndConfirmation) {
             Button("Save & Exit", role: nil) {
                 savePartialWorkout()
+                WorkoutStateManager.shared.clear()
                 endLiveActivity()
                 cancelRestNotification()
                 timer?.invalidate()
@@ -93,6 +96,7 @@ struct ActiveWorkoutView: View {
                 navigateToHistory()
             }
             Button("Discard", role: .destructive) {
+                WorkoutStateManager.shared.clear()
                 endLiveActivity()
                 cancelRestNotification()
                 timer?.invalidate()
@@ -104,13 +108,23 @@ struct ActiveWorkoutView: View {
             Text("Would you like to save your progress so far?")
         }
         .onAppear {
-            initializeExercise()
+            if let state = restoredState, !hasRestoredState {
+                restoreState(from: state)
+                hasRestoredState = true
+            } else {
+                initializeExercise()
+            }
             requestNotificationPermission()
             startWorkoutTimer()
         }
         .onChange(of: scenePhase) { _, newPhase in
-            if newPhase == .active {
+            switch newPhase {
+            case .active:
                 checkRestStatus()
+            case .background, .inactive:
+                saveState()
+            @unknown default:
+                break
             }
         }
     }
@@ -385,14 +399,17 @@ struct ActiveWorkoutView: View {
             if currentExerciseIndex + 1 >= selectedExercises.count {
                 // Last exercise - workout complete
                 saveWorkout()
+                WorkoutStateManager.shared.clear()
                 showingComplete = true
             } else {
                 // More exercises - rest then move to next exercise
                 startRest()
+                saveState()
             }
         } else {
             // More sets - rest then move to next set
             startRest()
+            saveState()
         }
     }
 
@@ -638,6 +655,97 @@ struct ActiveWorkoutView: View {
             restTimeRemaining = max(0, Int(endTime.timeIntervalSinceNow))
         }
     }
+
+    // MARK: - State Persistence
+
+    private func saveState() {
+        guard !showingComplete else { return }
+
+        let serializableSets = completedSets.map { exerciseSets in
+            exerciseSets.map { set in
+                InProgressWorkoutState.SerializableSet(
+                    setNumber: set.setNumber,
+                    weight: set.weight,
+                    reps: set.reps
+                )
+            }
+        }
+
+        let state = InProgressWorkoutState(
+            category: category.rawValue,
+            exerciseNames: selectedExercises.map { $0.name },
+            currentExerciseIndex: currentExerciseIndex,
+            currentSetIndex: currentSetIndex,
+            weight: weight,
+            reps: reps,
+            completedSets: serializableSets,
+            elapsedTime: elapsedTime,
+            lastSaveTime: Date(),
+            isPaused: isPaused,
+            isResting: isResting,
+            restTimeRemaining: restTimeRemaining,
+            pausedRestTimeRemaining: pausedRestTimeRemaining
+        )
+
+        WorkoutStateManager.shared.save(state)
+    }
+
+    private func restoreState(from state: InProgressWorkoutState) {
+        currentExerciseIndex = state.currentExerciseIndex
+        currentSetIndex = state.currentSetIndex
+        weight = state.weight
+        reps = state.reps
+        isPaused = state.isPaused
+        isResting = state.isResting
+        restTimeRemaining = state.restTimeRemaining
+        pausedRestTimeRemaining = state.pausedRestTimeRemaining
+
+        // Restore elapsed time, accounting for time since last save
+        let timeSinceSave = Int(Date().timeIntervalSince(state.lastSaveTime))
+        if state.isPaused {
+            elapsedTime = state.elapsedTime
+        } else {
+            elapsedTime = state.elapsedTime + timeSinceSave
+        }
+
+        // Restore completed sets
+        completedSets = state.completedSets.map { exerciseSets in
+            exerciseSets.map { set in
+                ExerciseSet(setNumber: set.setNumber, weight: set.weight, reps: set.reps)
+            }
+        }
+
+        // If we were resting, adjust rest time for elapsed background time
+        if isResting && !isPaused {
+            let adjustedRestTime = state.restTimeRemaining - timeSinceSave
+            if adjustedRestTime <= 0 {
+                // Rest completed while backgrounded
+                endRest()
+            } else {
+                restTimeRemaining = adjustedRestTime
+                restEndTime = Date().addingTimeInterval(TimeInterval(adjustedRestTime))
+                startRestTimerFromRestore()
+            }
+        }
+
+        WorkoutStateManager.shared.clear()
+    }
+
+    private func startRestTimerFromRestore() {
+        startLiveActivity()
+        scheduleRestNotification()
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+            if restTimeRemaining > 0 {
+                restTimeRemaining -= 1
+                if restTimeRemaining <= 3 && restTimeRemaining > 0 {
+                    playCountdownBeep()
+                }
+            } else {
+                playTimerEndSound()
+                endRest()
+            }
+        }
+    }
 }
 
 #Preview {
@@ -647,7 +755,8 @@ struct ActiveWorkoutView: View {
             selectedExercises: [
                 ExerciseDefinition(name: "Bench Press", type: .compound, category: .push, defaultSets: 3, defaultReps: "10")
             ],
-            navigationPath: .constant(NavigationPath())
+            navigationPath: .constant(NavigationPath()),
+            restoredState: nil
         )
     }
     .modelContainer(for: [Workout.self, CompletedExercise.self, ExerciseSet.self])
