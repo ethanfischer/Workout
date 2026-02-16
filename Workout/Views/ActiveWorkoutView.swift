@@ -35,6 +35,9 @@ struct ActiveWorkoutView: View {
     @State private var editingSet: (exerciseIndex: Int, setIndex: Int)? = nil
     @State private var editWeight: Double = 0
     @State private var editReps: Int = 0
+    @State private var isInWarmup = true
+    @State private var warmupTime = 0
+    @State private var warmupTimer: Timer?
 
     @Query private var workouts: [Workout]
 
@@ -57,6 +60,8 @@ struct ActiveWorkoutView: View {
                     duration: elapsedTime,
                     navigationPath: $navigationPath
                 )
+            } else if isInWarmup {
+                warmupView
             } else if isPaused {
                 pausedView
             } else if isResting {
@@ -68,7 +73,7 @@ struct ActiveWorkoutView: View {
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
-                if !isPaused && !showingComplete {
+                if !isPaused && !showingComplete && !isInWarmup {
                     Button {
                         togglePause()
                     } label: {
@@ -78,15 +83,19 @@ struct ActiveWorkoutView: View {
                 }
             }
             ToolbarItem(placement: .principal) {
-                Text(formatTime(elapsedTime))
-                    .font(.system(.title2, design: .monospaced))
-                    .fontWeight(.semibold)
-                    .foregroundColor(isPaused ? .secondary : .primary)
+                if !isInWarmup {
+                    Text(formatTime(elapsedTime))
+                        .font(.system(.title2, design: .monospaced))
+                        .fontWeight(.semibold)
+                        .foregroundColor(isPaused ? .secondary : .primary)
+                }
             }
             ToolbarItem(placement: .navigationBarTrailing) {
-                Text("\(currentExerciseIndex + 1) of \(selectedExercises.count)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                if !isInWarmup {
+                    Text("\(currentExerciseIndex + 1) of \(selectedExercises.count)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
         }
         .alert("End Workout?", isPresented: $showingEndConfirmation) {
@@ -376,6 +385,38 @@ struct ActiveWorkoutView: View {
             }
             .padding(.horizontal, 40)
             .padding(.bottom, 40)
+        }
+    }
+
+    private var warmupView: some View {
+        VStack(spacing: 24) {
+            Spacer()
+
+            Text("WARMUP")
+                .font(.title)
+                .fontWeight(.bold)
+
+            Text(formatTime(warmupTime))
+                .font(.system(size: 72, weight: .bold, design: .monospaced))
+
+            Spacer()
+
+            Button {
+                endWarmup()
+            } label: {
+                Text("END WARMUP")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.pink)
+                    .cornerRadius(12)
+            }
+            .padding(.horizontal, 40)
+            .padding(.bottom, 40)
+        }
+        .onAppear {
+            startWarmupTimer()
         }
     }
 
@@ -673,6 +714,20 @@ struct ActiveWorkoutView: View {
                 elapsedTime += 1
             }
         }
+    }
+
+    // MARK: - Warmup Timer
+
+    private func startWarmupTimer() {
+        warmupTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+            warmupTime += 1
+        }
+    }
+
+    private func endWarmup() {
+        warmupTimer?.invalidate()
+        warmupTimer = nil
+        isInWarmup = false
     }
 
     private func togglePause() {
