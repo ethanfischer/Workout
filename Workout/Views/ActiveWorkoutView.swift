@@ -38,6 +38,8 @@ struct ActiveWorkoutView: View {
     @State private var isInWarmup = true
     @State private var warmupTime = 0
     @State private var warmupTimer: Timer?
+    @State private var showingDifficultyRating = false
+    @State private var exerciseDifficulties: [Int: Int] = [:]  // exerciseIndex → rating
 
     @Query private var workouts: [Workout]
 
@@ -64,6 +66,8 @@ struct ActiveWorkoutView: View {
                 warmupView
             } else if isPaused {
                 pausedView
+            } else if showingDifficultyRating {
+                difficultyRatingView
             } else if isResting {
                 restView
             } else {
@@ -420,6 +424,61 @@ struct ActiveWorkoutView: View {
         }
     }
 
+    private var difficultyRatingView: some View {
+        VStack(spacing: 24) {
+            Spacer()
+
+            Text("HOW DID THAT FEEL?")
+                .font(.title2)
+                .fontWeight(.bold)
+
+            Text(currentExercise?.name ?? "")
+                .font(.headline)
+                .foregroundColor(.secondary)
+
+            HStack(spacing: 24) {
+                ForEach(1...5, id: \.self) { rating in
+                    Button {
+                        submitDifficultyRating(rating)
+                    } label: {
+                        Text(difficultyEmoji(for: rating))
+                            .font(.system(size: 44))
+                    }
+                }
+            }
+            .padding(.top, 16)
+
+            Spacer()
+        }
+    }
+
+    private func difficultyEmoji(for rating: Int) -> String {
+        switch rating {
+        case 1: return "😫"
+        case 2: return "😕"
+        case 3: return "😐"
+        case 4: return "🙂"
+        case 5: return "😄"
+        default: return ""
+        }
+    }
+
+    private func submitDifficultyRating(_ rating: Int) {
+        exerciseDifficulties[currentExerciseIndex] = rating
+        showingDifficultyRating = false
+
+        if currentExerciseIndex + 1 >= selectedExercises.count {
+            // Last exercise - workout complete
+            saveWorkout()
+            WorkoutStateManager.shared.clear()
+            showingComplete = true
+        } else {
+            // More exercises - rest then move to next exercise
+            startRest()
+            saveState()
+        }
+    }
+
     private var editWorkoutSheet: some View {
         NavigationStack {
             List {
@@ -641,17 +700,8 @@ struct ActiveWorkoutView: View {
         completedSets[currentExerciseIndex].append(set)
 
         if currentSetIndex + 1 >= totalSets {
-            // Last set of this exercise
-            if currentExerciseIndex + 1 >= selectedExercises.count {
-                // Last exercise - workout complete
-                saveWorkout()
-                WorkoutStateManager.shared.clear()
-                showingComplete = true
-            } else {
-                // More exercises - rest then move to next exercise
-                startRest()
-                saveState()
-            }
+            // Last set of this exercise - show difficulty rating
+            showingDifficultyRating = true
         } else {
             // More sets - rest then move to next set
             startRest()
@@ -783,6 +833,7 @@ struct ActiveWorkoutView: View {
         for (index, exercise) in selectedExercises.enumerated() {
             let completed = CompletedExercise(name: exercise.name, order: index)
             completed.sets = completedSets[index]
+            completed.difficultyRating = exerciseDifficulties[index]
             workout.exercises.append(completed)
         }
 
@@ -803,6 +854,7 @@ struct ActiveWorkoutView: View {
             guard index < completedSets.count && !completedSets[index].isEmpty else { continue }
             let completed = CompletedExercise(name: exercise.name, order: index)
             completed.sets = completedSets[index]
+            completed.difficultyRating = exerciseDifficulties[index]
             workout.exercises.append(completed)
         }
 

@@ -29,12 +29,14 @@ class CompletedExercise {
     var id: UUID
     var name: String
     var order: Int
+    var difficultyRating: Int?  // 1-5 scale (1=hard, 5=easy)
     @Relationship(deleteRule: .cascade) var sets: [ExerciseSet]
 
-    init(name: String, order: Int, sets: [ExerciseSet] = []) {
+    init(name: String, order: Int, sets: [ExerciseSet] = [], difficultyRating: Int? = nil) {
         self.id = UUID()
         self.name = name
         self.order = order
+        self.difficultyRating = difficultyRating
         self.sets = sets
     }
 }

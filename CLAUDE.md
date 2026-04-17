@@ -6,10 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Build for iOS Simulator
-xcodebuild -project Workout.xcodeproj -scheme Workout -destination 'platform=iOS Simulator,name=iPhone 16' build
+xcodebuild -project Workout.xcodeproj -scheme Workout -destination 'platform=iOS Simulator,name=iPhone 17' build
 
 # Run on simulator
-xcrun simctl boot "iPhone 16"
+xcrun simctl boot "iPhone 17"
 xcrun simctl install booted build/Debug-iphonesimulator/Workout.app
 xcrun simctl launch booted com.workout.TiffinWorkout
 ```

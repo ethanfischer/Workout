@@ -22,8 +22,13 @@ struct HistoryDetailView: View {
 
                 ForEach(workout.exercises.sorted { $0.order < $1.order }) { exercise in
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(exercise.name)
-                            .font(.headline)
+                        HStack {
+                            Text(exercise.name)
+                                .font(.headline)
+                            if let rating = exercise.difficultyRating {
+                                Text(difficultyEmoji(for: rating))
+                            }
+                        }
 
                         ForEach(exercise.sets.sorted { $0.setNumber < $1.setNumber }) { set in
                             HStack {
@@ -52,6 +57,17 @@ struct HistoryDetailView: View {
             return ResistanceLevel.from(rawValue: weight).displayName
         } else {
             return "\(Int(weight)) lbs"
+        }
+    }
+
+    private func difficultyEmoji(for rating: Int) -> String {
+        switch rating {
+        case 1: return "😫"
+        case 2: return "😕"
+        case 3: return "😐"
+        case 4: return "🙂"
+        case 5: return "😄"
+        default: return ""
         }
     }
 }
