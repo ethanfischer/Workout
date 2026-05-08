@@ -3,7 +3,7 @@ import SwiftUI
 struct ExerciseSelectionView: View {
     let category: WorkoutCategory
     @Binding var navigationPath: NavigationPath
-    @State private var selectedExercises: Set<ExerciseDefinition> = []
+    @State private var selectedExercises: [ExerciseDefinition] = []
 
     private var exercisesByType: [(type: ExerciseType, exercises: [ExerciseDefinition])] {
         let exercises = ExerciseData.exercises(for: category)
@@ -15,11 +15,6 @@ struct ExerciseSelectionView: View {
             let filtered = exercises.filter { $0.type == type }
             return filtered.isEmpty ? nil : (type, filtered)
         }
-    }
-
-    private var sortedSelectedExercises: [ExerciseDefinition] {
-        let allExercises = ExerciseData.exercises(for: category)
-        return allExercises.filter { selectedExercises.contains($0) }
     }
 
     var body: some View {
@@ -49,7 +44,7 @@ struct ExerciseSelectionView: View {
 
             NavigationLink(destination: ActiveWorkoutView(
                 category: category,
-                selectedExercises: sortedSelectedExercises,
+                selectedExercises: selectedExercises,
                 navigationPath: $navigationPath,
                 restoredState: nil
             )) {
@@ -81,7 +76,7 @@ struct ExerciseTypeSection: View {
     let type: ExerciseType
     let category: WorkoutCategory
     let exercises: [ExerciseDefinition]
-    @Binding var selectedExercises: Set<ExerciseDefinition>
+    @Binding var selectedExercises: [ExerciseDefinition]
 
     var body: some View {
         VStack(spacing: 0) {
@@ -121,8 +116,13 @@ struct ExerciseTypeSection: View {
                             toggleSelection(exercise)
                         } label: {
                             HStack(spacing: 8) {
-                                Image(systemName: selectedExercises.contains(exercise) ? "checkmark.square.fill" : "square")
-                                    .foregroundColor(selectedExercises.contains(exercise) ? .pink : .gray)
+                                if let order = selectedExercises.firstIndex(of: exercise) {
+                                    Image(systemName: "\(order + 1).square.fill")
+                                        .foregroundColor(.pink)
+                                } else {
+                                    Image(systemName: "square")
+                                        .foregroundColor(.gray)
+                                }
                                 ExerciseMediaView(exercise: exercise, size: 36)
                                 Text(exercise.name)
                                     .font(.caption)
@@ -147,10 +147,10 @@ struct ExerciseTypeSection: View {
     }
 
     private func toggleSelection(_ exercise: ExerciseDefinition) {
-        if selectedExercises.contains(exercise) {
-            selectedExercises.remove(exercise)
+        if let i = selectedExercises.firstIndex(of: exercise) {
+            selectedExercises.remove(at: i)
         } else {
-            selectedExercises.insert(exercise)
+            selectedExercises.append(exercise)
         }
     }
 }

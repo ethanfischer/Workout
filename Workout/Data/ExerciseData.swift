@@ -100,10 +100,13 @@ struct ExerciseData {
         ExerciseDefinition(name: "Chest Supported DB Row", type: .compound, category: .pull, defaultSets: 4, defaultReps: "10"),
         ExerciseDefinition(name: "Bent Over Row", type: .compound, category: .pull, defaultSets: 4, defaultReps: "10"),
         ExerciseDefinition(name: "DB Upright Row", type: .compound, category: .pull, defaultSets: 4, defaultReps: "10"),
+        ExerciseDefinition(name: "Scapula Row", type: .compound, category: .pull, defaultSets: 4, defaultReps: "10"),
         // Isolation
         ExerciseDefinition(name: "DB Pullovers", type: .accessory, category: .pull, defaultSets: 3, defaultReps: "10-12"),
         ExerciseDefinition(name: "Renegade Rows", type: .accessory, category: .pull, defaultSets: 3, defaultReps: "10-12"),
         ExerciseDefinition(name: "Banded Face Pull", type: .accessory, category: .pull, defaultSets: 3, defaultReps: "10-12"),
+        ExerciseDefinition(name: "Shoulder Shrugs", type: .accessory, category: .pull, defaultSets: 3, defaultReps: "10-12"),
+        ExerciseDefinition(name: "Banded Pull Aparts", type: .accessory, category: .pull, defaultSets: 3, defaultReps: "10-12"),
         ExerciseDefinition(name: "DB Curls", type: .accessory, category: .pull, defaultSets: 3, defaultReps: "10-12"),
     ]
 
