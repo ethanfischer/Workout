@@ -5,6 +5,7 @@ enum WorkoutCategory: String, Codable, CaseIterable {
     case push = "Push"
     case pull = "Pull"
     case legs = "Legs"
+    case core = "Core"
 }
 
 @Model

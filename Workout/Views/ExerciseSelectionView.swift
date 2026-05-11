@@ -68,6 +68,7 @@ struct ExerciseSelectionView: View {
         case .push: return "Upper body day - Push (shoulders + chest + triceps)"
         case .pull: return "Upper body day - Pull (back + biceps)"
         case .legs: return "Lower body day"
+        case .core: return "Core stability"
         }
     }
 }

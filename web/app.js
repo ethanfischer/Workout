@@ -13,24 +13,28 @@ const PICK_GUIDANCE = {
   push: { compound: "Pick 2", accessory: "Pick 3" },
   pull: { compound: "Pick 2", accessory: "Pick 3" },
   legs: { compound: "Pick 1-2", unilateral: "Pick 1-2", accessory: "Pick 2" },
+  core: { accessory: "Pick 2-3" },
 };
 
 const REPS_DISPLAY = {
   push: { compound: "3-4 x 10", accessory: "3 x 10-12" },
   pull: { compound: "3-4 x 10", accessory: "3 x 10-12" },
   legs: { compound: "4 x 10", unilateral: "3 x 10-12", accessory: "3 x 12-15" },
+  core: { accessory: "3 x 30s" },
 };
 
 const CATEGORY_SUBTITLE = {
   push: "Upper body day - Push (shoulders + chest + triceps)",
   pull: "Upper body day - Pull (back + biceps)",
   legs: "Lower body day",
+  core: "Core stability",
 };
 
 const TYPE_ORDER = {
   push: ["compound", "accessory"],
   pull: ["compound", "accessory"],
   legs: ["compound", "unilateral", "accessory"],
+  core: ["accessory"],
 };
 
 const TYPE_NAMES = {
@@ -43,7 +47,7 @@ const DIFFICULTY_EMOJI = ["", "😫", "😕", "😐", "🙂", "😄"];
 
 // ----- Exercise catalog -----
 
-let EXERCISES = { push: [], pull: [], legs: [] };
+let EXERCISES = { push: [], pull: [], legs: [], core: [] };
 
 async function loadExercises() {
   const res = await fetch("exercises.json");
@@ -383,7 +387,7 @@ function renderCategory(container) {
     navBar({ left: backButton(() => navigate("home")) }),
     el("div", { class: "section-title" }, "SELECT CATEGORY"),
     el("div", { class: "spacer" }),
-    ...["push", "pull", "legs"].map(cat =>
+    ...["push", "pull", "legs", "core"].map(cat =>
       el("button", { class: "category-button", onclick: () => { state.category = cat; navigate("exercises"); } },
         cat.toUpperCase())
     ),

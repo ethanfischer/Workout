@@ -39,5 +39,10 @@
     { "name": "Banded Lateral Walks", "type": "accessory", "defaultSets": 3, "defaultReps": "12-15" },
     { "name": "Side Lying Banded Leg Raise", "type": "accessory", "defaultSets": 3, "defaultReps": "12-15" },
     { "name": "DB Calf Raises", "type": "accessory", "defaultSets": 3, "defaultReps": "12-15" }
+  ],
+  "core": [
+    { "name": "Curl Up", "type": "accessory", "defaultSets": 3, "defaultReps": "30" },
+    { "name": "Side Plank", "type": "accessory", "defaultSets": 3, "defaultReps": "30" },
+    { "name": "Bird Dog", "type": "accessory", "defaultSets": 3, "defaultReps": "30" }
   ]
 }

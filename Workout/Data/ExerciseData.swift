@@ -131,11 +131,18 @@ struct ExerciseData {
         ExerciseDefinition(name: "DB Calf Raises", type: .accessory, category: .legs, defaultSets: 3, defaultReps: "12-15"),
     ]
 
+    static let core: [ExerciseDefinition] = [
+        ExerciseDefinition(name: "Curl Up", type: .accessory, category: .core, defaultSets: 3, defaultReps: "30"),
+        ExerciseDefinition(name: "Side Plank", type: .accessory, category: .core, defaultSets: 3, defaultReps: "30"),
+        ExerciseDefinition(name: "Bird Dog", type: .accessory, category: .core, defaultSets: 3, defaultReps: "30"),
+    ]
+
     static func exercises(for category: WorkoutCategory) -> [ExerciseDefinition] {
         switch category {
         case .push: return push
         case .pull: return pull
         case .legs: return legs
+        case .core: return core
         }
     }
 
@@ -148,6 +155,7 @@ struct ExerciseData {
         case (.legs, .compound): return "Pick 1-2"
         case (.legs, .unilateral): return "Pick 1-2"
         case (.legs, .accessory): return "Pick 2"
+        case (.core, .accessory): return "Pick 2-3"
         default: return ""
         }
     }
@@ -161,6 +169,7 @@ struct ExerciseData {
         case (.legs, .compound): return "4 x 10"
         case (.legs, .unilateral): return "3 x 10-12"
         case (.legs, .accessory): return "3 x 12-15"
+        case (.core, .accessory): return "3 x 30s"
         default: return ""
         }
     }
