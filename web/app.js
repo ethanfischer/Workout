@@ -58,19 +58,23 @@ function mediaFilename(name) {
   return name.toLowerCase().replace(/ /g, "_").replace(/\//g, "_");
 }
 
+const MEDIA_EXTENSIONS = ["gif", "png", "jpg", "jpeg", "webp"];
+
 function exerciseImg(name) {
   const base = `gifs/${mediaFilename(name)}`;
-  return el("img", {
-    src: `${base}.gif`,
+  const img = el("img", {
+    src: `${base}.${MEDIA_EXTENSIONS[0]}`,
     onerror: function () {
-      if (this.dataset.tried !== "png") {
-        this.dataset.tried = "png";
-        this.src = `${base}.png`;
+      const next = (parseInt(this.dataset.extIdx || "0", 10)) + 1;
+      if (next < MEDIA_EXTENSIONS.length) {
+        this.dataset.extIdx = String(next);
+        this.src = `${base}.${MEDIA_EXTENSIONS[next]}`;
       } else {
         this.style.visibility = "hidden";
       }
     },
   });
+  return img;
 }
 
 function isBanded(name) {
