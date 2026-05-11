@@ -167,6 +167,21 @@ input { font: inherit; color: inherit; background: none; border: none; }
   margin: 4px 0 16px;
 }
 
+.youtube-link {
+  display: block;
+  text-decoration: none;
+  text-align: center;
+  color: white;
+  background: var(--surface);
+  border: 1px solid var(--pink);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 0 4px 12px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.youtube-link:active { background: var(--surface-2); }
+
 /* Exercise picker */
 .type-section {
   border: 1px solid rgba(255,255,255,0.15);

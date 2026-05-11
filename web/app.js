@@ -59,17 +59,33 @@ function mediaFilename(name) {
 }
 
 const MEDIA_EXTENSIONS = ["gif", "png", "jpg", "jpeg", "webp"];
+const resolvedMediaExt = {}; // name -> extension that worked, or null if none
 
 function exerciseImg(name) {
   const base = `gifs/${mediaFilename(name)}`;
+
+  if (resolvedMediaExt[name] === null) {
+    return el("img", { style: { visibility: "hidden" } });
+  }
+
+  const startIdx = resolvedMediaExt[name]
+    ? MEDIA_EXTENSIONS.indexOf(resolvedMediaExt[name])
+    : 0;
+
   const img = el("img", {
-    src: `${base}.${MEDIA_EXTENSIONS[0]}`,
+    src: `${base}.${MEDIA_EXTENSIONS[startIdx]}`,
+    onload: function () {
+      const ext = this.src.split(".").pop();
+      resolvedMediaExt[name] = ext;
+    },
     onerror: function () {
-      const next = (parseInt(this.dataset.extIdx || "0", 10)) + 1;
+      const cur = parseInt(this.dataset.extIdx || String(startIdx), 10);
+      const next = cur + 1;
       if (next < MEDIA_EXTENSIONS.length) {
         this.dataset.extIdx = String(next);
         this.src = `${base}.${MEDIA_EXTENSIONS[next]}`;
       } else {
+        resolvedMediaExt[name] = null;
         this.style.visibility = "hidden";
       }
     },
@@ -426,6 +442,17 @@ function renderExercises(container) {
     el("div", { class: "subtitle" }, CATEGORY_SUBTITLE[cat]),
   );
 
+  if (cat === "core") {
+    container.appendChild(
+      el("a", {
+        class: "youtube-link",
+        href: "https://www.youtube.com/watch?v=FkpLS_mgEf4",
+        target: "_blank",
+        rel: "noopener noreferrer",
+      }, "▶  Watch core workout video")
+    );
+  }
+
   const scroll = el("div", { style: { flex: "1", overflowY: "auto", padding: "0 4px" } });
   for (const type of types) {
     const list = EXERCISES[cat].filter(e => e.type === type);
@@ -529,8 +556,16 @@ function onTick() {
       endRest();
       return;
     }
+    render();
+    return;
   }
-  render();
+  if (state.phase === "warmup") {
+    render();
+    return;
+  }
+  // Exercise / paused / difficulty: only refresh the nav timer text in place
+  const timerEl = document.getElementById("nav-timer");
+  if (timerEl) timerEl.textContent = formatTime(elapsedSeconds());
 }
 
 function onResumeFromBackground() {
@@ -551,7 +586,7 @@ function renderActive(container) {
     left: state.phase === "paused" ? null : el("button", {
       class: "nav-button", onclick: togglePause
     }, pauseIcon()),
-    title: el("span", { class: "timer-medium" }, formatTime(elapsedSeconds())),
+    title: el("span", { id: "nav-timer", class: "timer-medium" }, formatTime(elapsedSeconds())),
     right: el("span", { class: "nav-button", style: { fontSize: "13px", color: "var(--text-secondary)" } },
       `${state.currentExerciseIndex + 1} of ${state.selected.length}`)
   }));

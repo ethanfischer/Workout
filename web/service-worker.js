@@ -1,4 +1,4 @@
-const CACHE = "tiffin-v2";
+const CACHE = "tiffin-v3";
 const CORE = [
   "./",
   "index.html",
