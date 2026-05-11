@@ -58,6 +58,21 @@ function mediaFilename(name) {
   return name.toLowerCase().replace(/ /g, "_").replace(/\//g, "_");
 }
 
+function exerciseImg(name) {
+  const base = `gifs/${mediaFilename(name)}`;
+  return el("img", {
+    src: `${base}.gif`,
+    onerror: function () {
+      if (this.dataset.tried !== "png") {
+        this.dataset.tried = "png";
+        this.src = `${base}.png`;
+      } else {
+        this.style.visibility = "hidden";
+      }
+    },
+  });
+}
+
 function isBanded(name) {
   const n = name.toLowerCase();
   return n.includes("banded") || n.includes("resistance band");
@@ -448,7 +463,7 @@ function typeSection(type, cat, list) {
             onclick: () => toggleSelected(ex)
           },
             el("span", { class: "check-box" }, selected ? String(idx + 1) : ""),
-            el("img", { src: `gifs/${mediaFilename(ex.name)}.gif`, onerror: function() { this.style.visibility = "hidden"; } }),
+            exerciseImg(ex.name),
             el("span", { class: "name" }, ex.name)
           );
         })
@@ -573,7 +588,7 @@ function renderExerciseSet(container) {
   container.append(
     el("div", { class: "spacer" }),
     el("div", { class: "media-container" },
-      el("img", { src: `gifs/${mediaFilename(ex.name)}.gif`, onerror: function() { this.style.visibility = "hidden"; } })
+      exerciseImg(ex.name)
     ),
     el("div", { style: { display: "flex", flexDirection: "column", gap: "4px" } },
       el("div", { class: "exercise-name" }, ex.name),
