@@ -1,0 +1,43 @@
+{
+  "push": [
+    { "name": "Push Ups", "type": "compound", "defaultSets": 4, "defaultReps": "10" },
+    { "name": "DB Overhead Press", "type": "compound", "defaultSets": 4, "defaultReps": "10" },
+    { "name": "DB Bench Press", "type": "compound", "defaultSets": 4, "defaultReps": "10" },
+    { "name": "DB Lateral Raises", "type": "accessory", "defaultSets": 3, "defaultReps": "10-12" },
+    { "name": "DB Front Raises", "type": "accessory", "defaultSets": 3, "defaultReps": "10-12" },
+    { "name": "Tricep Band Pushdown", "type": "accessory", "defaultSets": 3, "defaultReps": "10-12" },
+    { "name": "DB Skullcrushers", "type": "accessory", "defaultSets": 3, "defaultReps": "10-12" },
+    { "name": "DB Chest Flys", "type": "accessory", "defaultSets": 3, "defaultReps": "10-12" },
+    { "name": "Dumbbell Tricep Extension", "type": "accessory", "defaultSets": 3, "defaultReps": "10-12" }
+  ],
+  "pull": [
+    { "name": "Banded Lat Pulldown", "type": "compound", "defaultSets": 4, "defaultReps": "10" },
+    { "name": "Chest Supported DB Row", "type": "compound", "defaultSets": 4, "defaultReps": "10" },
+    { "name": "Bent Over Row", "type": "compound", "defaultSets": 4, "defaultReps": "10" },
+    { "name": "DB Upright Row", "type": "compound", "defaultSets": 4, "defaultReps": "10" },
+    { "name": "Scapula Row", "type": "compound", "defaultSets": 4, "defaultReps": "10" },
+    { "name": "DB Pullovers", "type": "accessory", "defaultSets": 3, "defaultReps": "10-12" },
+    { "name": "Renegade Rows", "type": "accessory", "defaultSets": 3, "defaultReps": "10-12" },
+    { "name": "Banded Face Pull", "type": "accessory", "defaultSets": 3, "defaultReps": "10-12" },
+    { "name": "Shoulder Shrugs", "type": "accessory", "defaultSets": 3, "defaultReps": "10-12" },
+    { "name": "Banded Pull Aparts", "type": "accessory", "defaultSets": 3, "defaultReps": "10-12" },
+    { "name": "DB Curls", "type": "accessory", "defaultSets": 3, "defaultReps": "10-12" }
+  ],
+  "legs": [
+    { "name": "Goblet Squat", "type": "compound", "defaultSets": 4, "defaultReps": "10" },
+    { "name": "Sumo Squat", "type": "compound", "defaultSets": 4, "defaultReps": "10" },
+    { "name": "DB Front Squat", "type": "compound", "defaultSets": 4, "defaultReps": "10" },
+    { "name": "DB Deadlift", "type": "compound", "defaultSets": 4, "defaultReps": "10" },
+    { "name": "Banded Hip Thrust", "type": "compound", "defaultSets": 4, "defaultReps": "10" },
+    { "name": "DB Lunges", "type": "unilateral", "defaultSets": 3, "defaultReps": "10-12" },
+    { "name": "DB Split Squats", "type": "unilateral", "defaultSets": 3, "defaultReps": "10-12" },
+    { "name": "DB Split Stance RDL", "type": "unilateral", "defaultSets": 3, "defaultReps": "10-12" },
+    { "name": "DB Step Ups", "type": "unilateral", "defaultSets": 3, "defaultReps": "10-12" },
+    { "name": "DB Split Stance Hip Thrust", "type": "unilateral", "defaultSets": 3, "defaultReps": "10-12" },
+    { "name": "Resistance Band Hamstring Curl", "type": "accessory", "defaultSets": 3, "defaultReps": "12-15" },
+    { "name": "Banded Kickbacks", "type": "accessory", "defaultSets": 3, "defaultReps": "12-15" },
+    { "name": "Banded Lateral Walks", "type": "accessory", "defaultSets": 3, "defaultReps": "12-15" },
+    { "name": "Side Lying Banded Leg Raise", "type": "accessory", "defaultSets": 3, "defaultReps": "12-15" },
+    { "name": "DB Calf Raises", "type": "accessory", "defaultSets": 3, "defaultReps": "12-15" }
+  ]
+}
