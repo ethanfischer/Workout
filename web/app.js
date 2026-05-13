@@ -970,13 +970,23 @@ function renderHistory(container) {
   container.append(navBar({
     left: backButton(() => navigate("home")),
     title: el("span", {}, "History"),
+    right: el("button", {
+      class: "nav-button",
+      style: { color: "var(--pink)" },
+      onclick: showHistoryMenu,
+    }, "•••"),
   }));
   const all = loadWorkouts();
   if (all.length === 0) {
-    container.appendChild(
+    container.append(
       el("div", { class: "history-empty" },
         el("div", { style: { fontWeight: "600", color: "var(--text)" } }, "No workouts yet"),
-        el("div", {}, "Complete a workout to see it here")
+        el("div", {}, "Complete a workout to see it here"),
+        el("button", {
+          class: "nav-button",
+          style: { color: "var(--pink)", marginTop: "12px" },
+          onclick: triggerImport,
+        }, "Import History")
       )
     );
     return;
@@ -995,6 +1005,175 @@ function renderHistory(container) {
     );
   }
   container.appendChild(scroll);
+}
+
+// ----- Export / Import -----
+
+const EXPORT_VERSION = 1;
+
+const IOS_CATEGORY = { push: "Push", pull: "Pull", legs: "Legs", core: "Core" };
+const WEB_CATEGORY = { Push: "push", Pull: "pull", Legs: "legs", Core: "core" };
+
+function showHistoryMenu() {
+  const overlay = el("div", { class: "alert-backdrop", onclick: (e) => {
+    if (e.target === overlay) overlay.remove();
+  } });
+  const sheet = el("div", { class: "alert" },
+    el("div", { class: "alert-buttons" },
+      el("button", { onclick: () => { overlay.remove(); exportHistory(); } }, "Export History"),
+      el("button", { onclick: () => { overlay.remove(); triggerImport(); } }, "Import History"),
+      el("button", { onclick: () => overlay.remove() }, "Cancel")
+    )
+  );
+  overlay.appendChild(sheet);
+  document.body.appendChild(overlay);
+}
+
+function exportHistory() {
+  const all = loadWorkouts();
+  if (all.length === 0) {
+    showAlert("No workouts to export.");
+    return;
+  }
+  const payload = {
+    version: EXPORT_VERSION,
+    exportedAt: new Date().toISOString(),
+    workouts: all.map(w => ({
+      id: w.id || uuid(),
+      date: w.date,
+      category: IOS_CATEGORY[w.category] || capitalize(w.category),
+      durationSeconds: w.durationSeconds || 0,
+      exercises: (w.exercises || [])
+        .slice()
+        .sort((a, b) => a.order - b.order)
+        .map(ex => ({
+          id: ex.id || uuid(),
+          name: ex.name,
+          order: ex.order,
+          difficultyRating: ex.difficultyRating ?? null,
+          sets: (ex.sets || [])
+            .slice()
+            .sort((a, b) => a.setNumber - b.setNumber)
+            .map(s => ({
+              id: s.id || uuid(),
+              setNumber: s.setNumber,
+              weight: s.weight,
+              reps: s.reps,
+            })),
+        })),
+    })),
+  };
+
+  const json = JSON.stringify(payload, null, 2);
+  const blob = new Blob([json], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const ymd = new Date().toISOString().slice(0, 10);
+  const filename = `tiffin-workouts-${ymd}.json`;
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function triggerImport() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "application/json,.json";
+  input.onchange = async () => {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const summary = importHistoryFromJSON(text);
+      showAlert(`Imported ${summary.imported} workout${summary.imported === 1 ? "" : "s"}. Skipped ${summary.skipped} duplicate${summary.skipped === 1 ? "" : "s"}.`);
+      render();
+    } catch (err) {
+      showAlert(`Import failed: ${err.message || err}`);
+    }
+  };
+  input.click();
+}
+
+function importHistoryFromJSON(text) {
+  let payload;
+  try {
+    payload = JSON.parse(text);
+  } catch (e) {
+    throw new Error("File is not valid JSON");
+  }
+  if (!payload || typeof payload !== "object" || !Array.isArray(payload.workouts)) {
+    throw new Error("Not a Tiffin workout export");
+  }
+  if (typeof payload.version === "number" && payload.version > EXPORT_VERSION) {
+    throw new Error(`Unsupported export version: ${payload.version}`);
+  }
+
+  const existing = loadWorkouts();
+  const existingIds = new Set(existing.map(w => w.id).filter(Boolean));
+
+  let imported = 0;
+  let skipped = 0;
+  const toAdd = [];
+
+  for (const w of payload.workouts) {
+    const id = w.id || uuid();
+    if (existingIds.has(id)) {
+      skipped++;
+      continue;
+    }
+    const rawCat = w.category;
+    const webCat = WEB_CATEGORY[rawCat] || (typeof rawCat === "string" ? rawCat.toLowerCase() : null);
+    if (!webCat || !["push", "pull", "legs", "core"].includes(webCat)) {
+      throw new Error(`Unknown category: ${rawCat}`);
+    }
+    toAdd.push({
+      id,
+      date: w.date,
+      category: webCat,
+      durationSeconds: w.durationSeconds || 0,
+      exercises: (w.exercises || []).map(ex => ({
+        id: ex.id || uuid(),
+        name: ex.name,
+        order: ex.order || 0,
+        difficultyRating: ex.difficultyRating ?? null,
+        sets: (ex.sets || []).map(s => ({
+          id: s.id || uuid(),
+          setNumber: s.setNumber,
+          weight: s.weight,
+          reps: s.reps,
+        })),
+      })),
+    });
+    existingIds.add(id);
+    imported++;
+  }
+
+  if (toAdd.length > 0) {
+    const merged = [...toAdd, ...existing].sort((a, b) => (a.date < b.date ? 1 : -1));
+    saveWorkouts(merged);
+  }
+
+  return { imported, skipped };
+}
+
+function showAlert(message) {
+  const overlay = el("div", { class: "alert-backdrop" });
+  overlay.appendChild(
+    el("div", { class: "alert" },
+      el("div", { class: "alert-body" },
+        el("div", { class: "title" }, "History"),
+        el("div", { class: "msg" }, message)
+      ),
+      el("div", { class: "alert-buttons" },
+        el("button", { onclick: () => overlay.remove() }, "OK")
+      )
+    )
+  );
+  document.body.appendChild(overlay);
 }
 
 function renderDetail(container) {
