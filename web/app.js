@@ -300,6 +300,7 @@ const state = {
 
 let tickInterval = null;
 const root = document.getElementById("app");
+const modalsRoot = document.getElementById("modals");
 
 // ----- Helpers -----
 
@@ -371,6 +372,7 @@ function totalSetsForCurrent() {
 
 function render() {
   root.innerHTML = "";
+  modalsRoot.innerHTML = "";
   const screen = el("div", { class: "screen" });
   switch (state.screen) {
     case "home": renderHome(screen); break;
@@ -1242,7 +1244,7 @@ function renderEditModal() {
     });
   });
   overlay.appendChild(sheet);
-  document.body.appendChild(overlay);
+  modalsRoot.appendChild(overlay);
 }
 
 function renderEditSetModal() {
@@ -1300,7 +1302,7 @@ function renderEditSetModal() {
     )
   );
   overlay.appendChild(sheet);
-  document.body.appendChild(overlay);
+  modalsRoot.appendChild(overlay);
 }
 
 function renderEndConfirm() {
@@ -1318,7 +1320,7 @@ function renderEndConfirm() {
       )
     )
   );
-  document.body.appendChild(overlay);
+  modalsRoot.appendChild(overlay);
 }
 
 // ----- Nav helpers -----
